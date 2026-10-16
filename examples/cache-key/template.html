@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="一个图文同步的缓存键示例：比较文档版本和模型版本，判断能否复用已有结果。">
+  <title>两项都匹配，才复用 · Explain with Models</title>
+  <style>
+    :root { color-scheme: light; --paper: #f6f5f0; --surface: #fffefa; --ink: #25332f; --muted: #60716a; --line: #d4dcd4; --green: #176650; --green-soft: #e3f0e8; --orange: #975128; --orange-soft: #fbecde; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    main { max-width: 1180px; margin: auto; padding: 48px 28px 36px; }
+    .eyebrow { margin: 0 0 16px; color: var(--muted); font: 600 12px/1.5 ui-monospace, monospace; letter-spacing: .13em; }
+    h1 { margin: 0 0 16px; font-size: clamp(30px, 5vw, 48px); letter-spacing: -.04em; line-height: 1.2; }
+    .thesis { font-size: 19px; margin: 0 0 8px; }
+    .definition { color: var(--muted); margin: 0 0 28px; max-width: 900px; }
+    code, .number { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    code { font-size: .92em; }
+    .explainer { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: 0 12px 36px #233a2a05; }
+    .controls { padding: 20px 24px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+    .controls p { margin: 0; font-size: 14px; font-weight: 600; }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; }
+    button { appearance: none; border: 1px solid #c1ccc3; border-radius: 8px; padding: 9px 14px; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; min-height: 44px; }
+    button[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: white; }
+    button:hover:not(:disabled):not([aria-pressed="true"]) { background: #edf1eb; }
+    button:disabled { cursor: default; }
+    :focus-visible { outline: 3px solid #b86227; outline-offset: 4px; }
+    .stage { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr); }
+    figure { margin: 0; padding: 24px 16px 22px 24px; min-width: 0; background: radial-gradient(ellipse at 50% 60%, #e8ede329 0%, transparent 65%); }
+    .figure-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 8px; color: var(--muted); font-size: 12px; }
+    .figure-meta span:first-child { font-family: ui-monospace, monospace; letter-spacing: .05em; }
+    svg { display: block; width: 100%; height: auto; overflow: visible; }
+    svg text { font-family: inherit; fill: var(--ink); }
+    .svg-label { font-size: 23px; font-weight: 600; }
+    .svg-small { font-size: 23px; fill: var(--muted); }
+    .svg-number { font: 600 34px ui-monospace, monospace; }
+    .svg-index { font: 600 24px ui-monospace, monospace; fill: white; }
+    .wire { fill: none; stroke: #82968a; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+    .wire.active { stroke: var(--green); }
+    .wire.inactive { stroke: #b0b8af; stroke-dasharray: 4 9; }
+    .slot .tile-face { fill: #e4f0e8; stroke: #40846e; stroke-width: 2; }
+    .slot .tile-top { fill: #f0f8ef; stroke: #40846e; stroke-width: 2; }
+    .slot .tile-side { fill: #b6cbbd; stroke: #40846e; stroke-width: 2; }
+    .slot[data-match="false"] .tile-face { fill: var(--orange-soft); stroke: var(--orange); }
+    .slot[data-match="false"] .tile-top { fill: #fff2e7; stroke: var(--orange); }
+    .slot[data-match="false"] .tile-side { fill: #d8b99b; stroke: var(--orange); }
+    .slot .comparison { font: 600 30px ui-monospace, monospace; fill: var(--green); }
+    .slot[data-match="false"] .comparison { fill: var(--orange); }
+    .slot .incoming { transform: translate(0, 0); }
+    .slot[data-match="false"] .incoming { transform: translate(0, -10px); }
+    #cache-lamp { fill: var(--green); }
+    #cache[data-reuse="false"] #cache-lamp { fill: var(--orange); }
+    #cache-result { font-size: 22px; font-weight: 600; fill: var(--green); }
+    #cache[data-reuse="false"] #cache-result { fill: var(--orange); }
+    figcaption { margin: 4px 8px 0; font-size: 13px; color: var(--muted); }
+    .explanation { padding: 30px 28px; border-left: 1px solid var(--line); display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+    .current-label { color: var(--muted); font-size: 12px; letter-spacing: .08em; margin: 0 0 12px; }
+    .result { color: var(--green); font-size: 28px; line-height: 1.35; margin: 0 0 10px; letter-spacing: -.02em; }
+    .explanation[data-reuse="false"] .result { color: var(--orange); }
+    .reason { margin: 0 0 24px; }
+    .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .checks li { display: flex; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 9px; background: #fbfcf8; align-items: flex-start; }
+    .checks li[data-match="false"] { border-color: #c8a384; background: var(--orange-soft); }
+    .step-number { flex: 0 0 24px; height: 24px; display: inline-flex; justify-content: center; align-items: center; background: var(--green); color: white; border-radius: 50%; font: 600 12px ui-monospace, monospace; margin-top: 2px; }
+    .checks li[data-match="false"] .step-number { background: var(--orange); }
+    .check-title { font-size: 14px; font-weight: 650; }
+    .check-detail { display: block; font-size: 13px; color: var(--muted); }
+    .rule { border-top: 1px solid var(--line); padding: 16px 24px; background: #f1f4ed; font-size: 14px; }
+    .rule p { margin: 0; }
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; }
+    details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 20px; }
+    summary { padding: 16px 0; font-weight: 600; cursor: pointer; }
+    details p { margin: 0 0 16px; font-size: 14px; }
+    .question { padding: 16px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .question h2 { margin: 0 0 7px; font-size: 16px; }
+    .question > p { margin: 0; font-size: 14px; }
+    .question details { background: transparent; border: 0; border-radius: 0; padding: 0; }
+    .question summary { font-size: 14px; padding: 12px 0 0; color: var(--green); }
+    .question details p { margin: 12px 0 0; }
+    .model-note { margin: 18px 2px 0; color: var(--muted); font-size: 12px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    noscript p { background: #fbecde; padding: 12px 20px; margin: 0; }
+    @media (max-width: 760px) {
+      main { padding: 28px 16px; }
+      .thesis { font-size: 17px; }
+      .definition { font-size: 14px; }
+      .stage { grid-template-columns: 1fr; }
+      .controls { padding: 16px; gap: 10px; }
+      .presets { width: 100%; }
+      button { flex: 1; padding: 9px 8px; white-space: nowrap; }
+      figure { padding: 18px 8px 15px; }
+      .explanation { padding: 24px 20px; border-left: 0; border-top: 1px solid var(--line); }
+      .result { font-size: 25px; }
+      .reason { margin-bottom: 18px; }
+      .rule { padding: 16px 20px; }
+      .details-grid { grid-template-columns: 1fr; gap: 12px; }
+    }
+    @media print { body { background: white; } main { padding: 0; } .controls, .model-note { display: none; } .explainer, .question, details { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">EXPLAIN WITH MODELS / 01</p>
+    <h1>两项都匹配，才复用</h1>
+    <p class="thesis">缓存还在，而且文档版本、模型版本都匹配时，才复用结果。</p>
+    <p class="definition">缓存是保存的旧结果。缓存键是一组识别值。本例定义：<code>键 =（文档版本，模型版本）</code>。示例固定有缓存，并忽略过期与淘汰。</p>
+  </header>
+
+  <section class="explainer" aria-label="缓存键交互示例">
+    <div class="controls">
+      <p id="preset-label">改变一项，看看结果</p>
+      <div class="presets" role="group" aria-labelledby="preset-label">
+        <button type="button" data-preset="match" aria-pressed="true" disabled>两项匹配</button>
+        <button type="button" data-preset="document" aria-pressed="false" disabled>文档变化</button>
+        <button type="button" data-preset="model" aria-pressed="false" disabled>模型变化</button>
+      </div>
+    </div>
+    <noscript><p>当前显示两项匹配的静态示例。启用 JavaScript 后，可以切换三个案例。</p></noscript>
+    <div class="stage">
+      <figure>
+        <div class="figure-meta"><span>FIG. 01 / 两个比对槽</span><span>已有缓存键 (3, 2)</span></div>
+        <svg xmlns="http://www.w3.org/2000/svg" id="diagram" viewBox="0 0 640 460" role="img" aria-labelledby="diagram-title diagram-description">
+          <title id="diagram-title">文档版本和模型版本的两个比对槽</title>
+          <desc id="diagram-description">当前键为 (3,2)，已有缓存键为 (3,2)。两项版本都匹配，缓存存在，可以复用。绿色实线连接到缓存盒。</desc>
+          <defs>
+            <filter id="shadow" x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="8" /></filter>
+          </defs>
+          <!-- Original illustration. These abstract mechanical parts represent comparisons; they are not a physical cache. -->
+          <ellipse cx="322" cy="406" rx="250" ry="24" fill="#213b2a" opacity=".09" filter="url(#shadow)" />
+          <!-- Bench: shaded top, front and side. -->
+          <path d="M46 142 563 142 607 181 90 181Z" fill="#e1e7dd" stroke="#b0bdae" stroke-width="2" />
+          <path d="M90 181H607V390H90Z" fill="#eff1e8" stroke="#b0bdae" stroke-width="2" />
+          <path d="M46 142 90 181V390L46 351Z" fill="#ccd6c8" stroke="#b0bdae" stroke-width="2" />
+          <path d="M90 373H607M77 170V366" fill="none" stroke="#c6d0c1" stroke-width="2" />
+          <path d="M102 390V407H135V390M548 390V407H581V390" fill="#879786" stroke="#71826f" stroke-width="2" />
+          <g fill="#bac5b5" stroke="#97a591" stroke-width="1.5"><circle cx="104" cy="195" r="4" /><circle cx="593" cy="195" r="4" /><circle cx="104" cy="360" r="4" /><circle cx="593" cy="360" r="4" /></g>
+          <!-- Wires join each comparator to the cache's two-input latch. -->
+          <path id="document-wire" class="wire active" d="M326 204H373V251H427" />
+          <path id="model-wire" class="wire active" d="M326 322H391V277H427" />
+          <g fill="#fafcf5" stroke="#82968a" stroke-width="2"><circle cx="326" cy="204" r="6" /><circle cx="326" cy="322" r="6" /><circle cx="427" cy="251" r="6" /><circle cx="427" cy="277" r="6" /></g>
+          <text class="svg-small" x="139" y="110" text-anchor="middle">当前值</text>
+          <text class="svg-small" x="274" y="110" text-anchor="middle">缓存值</text>
+          <!-- Document comparator. -->
+          <g class="slot" id="document-slot" data-match="true">
+            <text class="svg-label" x="118" y="151">文档版本</text>
+            <path d="M112 175H325V239H112Z" fill="#d8e0d2" stroke="#a8b5a3" stroke-width="2" />
+            <path d="M112 175 99 164H312L325 175" fill="#edf1e7" stroke="#a8b5a3" stroke-width="2" />
+            <g class="incoming">
+              <path class="tile-top" d="M121 179 109 167H162L174 179Z" />
+              <path class="tile-side" d="M109 167 121 179V225L109 213Z" />
+              <rect class="tile-face" x="121" y="179" width="53" height="46" rx="3" />
+              <text id="document-value" class="svg-number" x="147.5" y="213" text-anchor="middle">3</text>
+            </g>
+            <text id="document-comparison" class="comparison" x="208" y="215" text-anchor="middle">=</text>
+            <path d="M249 179 237 167H290L302 179Z" fill="#fcfdf6" stroke="#9eaf99" stroke-width="2" />
+            <path d="M237 167 249 179V225L237 213Z" fill="#c5d2bf" stroke="#9eaf99" stroke-width="2" />
+            <rect x="249" y="179" width="53" height="46" rx="3" fill="#f4f6ee" stroke="#9eaf99" stroke-width="2" />
+            <text class="svg-number" x="275.5" y="213" text-anchor="middle">3</text>
+            <circle cx="329" cy="153" r="14" fill="#176650" /><text class="svg-index" x="329" y="159" text-anchor="middle">1</text>
+          </g>
+          <!-- Model comparator. -->
+          <g class="slot" id="model-slot" data-match="true">
+            <text class="svg-label" x="118" y="269">模型版本</text>
+            <path d="M112 293H325V357H112Z" fill="#d8e0d2" stroke="#a8b5a3" stroke-width="2" />
+            <path d="M112 293 99 282H312L325 293" fill="#edf1e7" stroke="#a8b5a3" stroke-width="2" />
+            <g class="incoming">
+              <path class="tile-top" d="M121 297 109 285H162L174 297Z" />
+              <path class="tile-side" d="M109 285 121 297V343L109 331Z" />
+              <rect class="tile-face" x="121" y="297" width="53" height="46" rx="3" />
+              <text id="model-value" class="svg-number" x="147.5" y="331" text-anchor="middle">2</text>
+            </g>
+            <text id="model-comparison" class="comparison" x="208" y="333" text-anchor="middle">=</text>
+            <path d="M249 297 237 285H290L302 297Z" fill="#fcfdf6" stroke="#9eaf99" stroke-width="2" />
+            <path d="M237 285 249 297V343L237 331Z" fill="#c5d2bf" stroke="#9eaf99" stroke-width="2" />
+            <rect x="249" y="297" width="53" height="46" rx="3" fill="#f4f6ee" stroke="#9eaf99" stroke-width="2" />
+            <text class="svg-number" x="275.5" y="331" text-anchor="middle">2</text>
+            <circle cx="329" cy="271" r="14" fill="#176650" /><text class="svg-index" x="329" y="277" text-anchor="middle">2</text>
+          </g>
+          <!-- Cache drawer: its status is derived from the same decision as the prose. -->
+          <g id="cache" data-reuse="true">
+            <path d="M428 208 403 184H533L558 208Z" fill="#e3eadc" stroke="#8e9f87" stroke-width="2" />
+            <path d="M403 184 428 208V334L403 310Z" fill="#a9baa0" stroke="#8e9f87" stroke-width="2" />
+            <rect x="428" y="208" width="130" height="126" rx="3" fill="#cbd8c1" stroke="#8e9f87" stroke-width="2" />
+            <rect x="441" y="223" width="104" height="97" rx="3" fill="#f7f9f0" stroke="#9eaf94" stroke-width="2" />
+            <path d="M470 303H516V312H470Z" fill="#b0bfa7" stroke="#8e9f87" stroke-width="2" />
+            <circle id="cache-lamp" cx="459" cy="242" r="5" />
+            <text x="474" y="249" font-size="23">有缓存</text>
+            <text id="cache-result" x="493" y="282" text-anchor="middle">复用</text>
+            <text class="svg-small" x="491" y="363" text-anchor="middle">已有 (3, 2)</text>
+          </g>
+        </svg>
+        <figcaption>编号对应文字检查项。错开的卡位表示该字段不匹配。</figcaption>
+      </figure>
+
+      <div class="explanation" id="explanation" data-reuse="true" aria-labelledby="result-title">
+        <p class="current-label">当前键 <span class="number" id="current-key">(3, 2)</span> · 已有缓存</p>
+        <h2 class="result" id="result-title">可以复用旧结果</h2>
+        <p class="reason" id="reason">两项版本都匹配。这个请求可以直接使用已有结果。</p>
+        <ol class="checks">
+          <li id="document-check" data-match="true">
+            <span class="step-number" aria-hidden="true">1</span>
+            <div><span class="check-title">文档版本</span><span class="check-detail" id="document-detail">当前 3 = 缓存 3 · 匹配</span></div>
+          </li>
+          <li id="model-check" data-match="true">
+            <span class="step-number" aria-hidden="true">2</span>
+            <div><span class="check-title">模型版本</span><span class="check-detail" id="model-detail">当前 2 = 缓存 2 · 匹配</span></div>
+          </li>
+        </ol>
+      </div>
+    </div>
+    <div class="rule"><p><strong>判断规则：</strong>缓存存在 <strong>并且</strong> 两项版本匹配 → 复用。否则 → 重新计算。</p></div>
+    <div id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  </section>
+
+  <div class="details-grid">
+    <details>
+      <summary>类比边界：卡位没有解释什么？</summary>
+      <p>两个比对槽只表示两次相等比较。连接线表示两个条件都必须成立；它不表示数据传输顺序。</p>
+      <p>缓存是数据，不是真实的机械盒。本例固定保存键 <code>(3, 2)</code>，只展示判断，不执行计算，也不写入新缓存。</p>
+      <p>真实缓存还可能检查过期时间、淘汰状态或其他条件。本例忽略这些规则，不能据此判断所有缓存系统。</p>
+      <p>键还必须覆盖影响结果的相关输入。如果遗漏了一个输入，即使这两项匹配，也不能保证旧结果仍然正确。</p>
+    </details>
+    <section class="question" aria-labelledby="question-title">
+      <h2 id="question-title">先预测，再看答案</h2>
+      <p>如果两项版本都匹配，但缓存已被删除，还能复用吗？</p>
+      <details>
+        <summary>显示答案</summary>
+        <p><strong>不能。</strong>“缓存存在”也是必要条件。没有旧结果，就要重新计算。</p>
+      </details>
+    </section>
+  </div>
+  <p class="model-note">这是自包含的玩具模型。示例代码和 SVG 均为原创，无网络请求、无自动播放。</p>
+</main>
+<!-- CACHE_RUNTIME -->
+</body>
+</html>

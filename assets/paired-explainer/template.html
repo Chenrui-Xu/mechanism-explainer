@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A queue holds a job until a worker accepts it</title>
+<style>
+/*__PAIRED_CSS__*/
+.queue-shape { fill: var(--pe-surface); stroke: var(--pe-border); stroke-width: 2; }
+.queue-label { fill: var(--pe-text); font: 600 22px system-ui, sans-serif; text-anchor: middle; }
+.queue-value { fill: var(--pe-muted); font: 20px system-ui, sans-serif; text-anchor: middle; }
+.queue-job { fill: var(--pe-tint); stroke: var(--pe-accent); stroke-width: 2; }
+.queue-arrow { fill: none; stroke: var(--pe-border); stroke-width: 2; }
+</style>
+</head>
+<body class="pe-page">
+<main id="queue-explainer">
+  <header>
+    <p>Paired explainer · reusable starter</p>
+    <h1>A queue holds a job until a worker accepts it.</h1>
+    <p>Accepting a job removes it from the <span class="pe-ref" data-ref="queue" tabindex="0">queue</span>.
+      The <span class="pe-ref" data-ref="worker" tabindex="0">worker</span> still has to finish the job.</p>
+  </header>
+  <section class="pe-pair" aria-label="Queue and its current explanation">
+    <figure class="pe-visual">
+      <div class="pe-stage">
+        <svg viewBox="0 0 510 250" role="group" aria-labelledby="queue-figure-title queue-figure-description">
+          <title id="queue-figure-title">A queue and one worker</title>
+          <desc id="queue-figure-description">The queue holds waiting jobs. The worker holds an active job after accepting it. Current values are shown below each label and in the adjacent explanation.</desc>
+          <defs><marker id="queue-arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="var(--pe-border)"/></marker></defs>
+          <path class="queue-arrow" d="M205 127H300" marker-end="url(#queue-arrowhead)"/>
+          <text class="queue-value" x="255" y="105">accepts</text>
+          <g data-ref="queue" tabindex="0" role="group" aria-label="Queue, holds waiting jobs">
+            <rect class="queue-shape pe-ref-mark" x="15" y="35" width="190" height="180" rx="6"/>
+            <text class="queue-label" x="110" y="72">Queue</text>
+            <rect data-queue-job class="queue-job" x="87" y="96" width="46" height="46" rx="3" visibility="hidden"/>
+            <text class="queue-value" data-queue-count x="110" y="184">{{INITIAL_COUNT}}</text>
+          </g>
+          <g data-ref="worker" tabindex="0" role="group" aria-label="Worker, runs an accepted job">
+            <rect class="queue-shape pe-ref-mark" x="305" y="35" width="190" height="180" rx="6"/>
+            <text class="queue-label" x="400" y="72">Worker</text>
+            <rect data-worker-job class="queue-job" x="377" y="96" width="46" height="46" rx="3" visibility="hidden"/>
+            <text class="queue-value" data-worker-state x="400" y="184">{{INITIAL_WORKER}}</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Fig. 1. The current state shows where the job waits or runs. An outlined square represents one job.</figcaption>
+    </figure>
+    <div class="pe-explanation">
+      <h2 data-step-title>{{INITIAL_TITLE}}</h2>
+      <p>Look at the <span data-ref="queue" tabindex="0">queue</span> and the <span data-ref="worker" tabindex="0">worker</span>.</p>
+      <p role="status" aria-live="polite" aria-atomic="true" data-explanation>{{INITIAL_EXPLANATION}}</p>
+      <div class="pe-controls" data-step-controls hidden aria-label="Inspect the sequence">
+        <button type="button" data-step-go="-1">Previous</button>
+        <span class="pe-position" data-step-status>1 / 3</span>
+        <button type="button" data-step-go="1">Next</button>
+        <button type="button" data-step-reset>Reset</button>
+        <label>Step <input data-step-index type="range" min="0" max="2" step="1" value="0"></label>
+      </div>
+      <p class="pe-hint">Use Next or the step slider. Focus or hover a named part to highlight its matching text and shape.</p>
+      <noscript><p>The first state is shown. Read all three states below; no interaction is needed.</p></noscript>
+    </div>
+  </section>
+  <section class="pe-summary" aria-labelledby="sequence-title">
+    <h2 id="sequence-title">All three states</h2>
+    <ol>{{ALL_STATES}}</ol>
+    <p class="pe-boundary">Illustrative sequence: one queue, one worker, one job. It omits retries, failures, timing, and concurrent workers.</p>
+  </section>
+</main>
+<!-- Upstream patterns: visual-explainer (c) 2025 Nico Bailon, MIT.
+     Adaptation: Explain with Models (c) 2026 Chenrui Xu, MIT.
+     Full notice is distributed in vendor/visual-explainer/LICENSE. -->
+<script>
+/*__UPSTREAM_LICENSE__*/
+/*__PAIRED_RUNTIME__*/
+/*__QUEUE_MODEL__*/
+mountStepper(document.getElementById('queue-explainer'), {
+  steps: queueSteps,
+  render({ step }, root) {
+    const view = queueView(step);
+    root.querySelector('[data-step-title]').textContent = view.title;
+    root.querySelector('[data-queue-count]').textContent = view.count;
+    root.querySelector('[data-worker-state]').textContent = view.worker;
+    root.querySelector('[data-explanation]').textContent = view.explanation;
+    root.querySelector('[data-queue-job]').setAttribute('visibility', view.queueJobVisible ? 'visible' : 'hidden');
+    root.querySelector('[data-worker-job]').setAttribute('visibility', view.workerJobVisible ? 'visible' : 'hidden');
+  },
+});
+</script>
+</body>
+</html>

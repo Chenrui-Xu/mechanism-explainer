@@ -1,0 +1,61 @@
+/* Adapted layout/highlight patterns: visual-explainer, MIT, (c) 2025 Nico Bailon.
+   See ../../vendor/visual-explainer/. Local changes (c) 2026 Chenrui Xu, MIT. */
+:root {
+  color-scheme: light dark;
+  --pe-bg: #f7f7f4; --pe-surface: #fff; --pe-text: #17191c;
+  --pe-muted: #575c63; --pe-border: #848482; --pe-accent: #2c4cd0;
+  --pe-tint: #e9edff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pe-bg: #111316; --pe-surface: #181b1f; --pe-text: #e8e8e3;
+    --pe-muted: #b2b7bf; --pe-border: #848c94; --pe-accent: #acbaff;
+    --pe-tint: #252f53;
+  }
+}
+.pe-page { color: var(--pe-text); background: var(--pe-bg); font: 1rem/1.65 system-ui, sans-serif; margin: 0; }
+.pe-page * { box-sizing: border-box; }
+.pe-page main { max-width: 68rem; margin: auto; padding: 2rem 1.25rem 4rem; }
+.pe-page h1 { max-width: 28ch; line-height: 1.15; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.025em; }
+.pe-page p, .pe-page li { max-width: 65ch; }
+.pe-page a { color: var(--pe-accent); }
+.pe-pair { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.pe-pair > * { min-width: 0; }
+.pe-visual { margin: 0; }
+.pe-stage { background: var(--pe-surface); border: 1px solid var(--pe-border); border-radius: .5rem; padding: 1rem; }
+.pe-stage svg { width: 100%; height: auto; display: block; overflow: visible; }
+.pe-visual figcaption { margin-top: .75rem; font-size: .95rem; }
+.pe-explanation h2 { margin: 0 0 .5rem; font-size: 1.4rem; line-height: 1.35; }
+.pe-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 1rem 0; }
+.pe-controls button { font: inherit; color: var(--pe-text); background: var(--pe-surface); border: 1px solid var(--pe-border); border-radius: .25rem; padding: .5rem .75rem; min-height: 2.75rem; cursor: pointer; }
+.pe-controls button:disabled { cursor: default; opacity: .55; }
+.pe-controls input { min-width: 0; max-width: 100%; accent-color: var(--pe-accent); }
+.pe-controls label { display: flex; align-items: center; gap: .5rem; }
+.pe-position { font-variant-numeric: tabular-nums; }
+.pe-summary { margin-top: 2rem; border-top: 1px solid var(--pe-border); padding-top: 1rem; }
+.pe-page [hidden] { display: none !important; }
+.pe-page :focus-visible, .pe-pair :focus-visible { outline: 3px solid var(--pe-accent); outline-offset: 4px; }
+/* An underline/outline changes shape as well as color. Labels never fade out. */
+.pe-ref, .pe-explanation [data-ref] { text-decoration: underline dotted; text-underline-offset: .22em; cursor: default; }
+.pe-ref[data-ref-active], .pe-explanation [data-ref-active] { background: var(--pe-tint); text-decoration-style: solid; text-decoration-thickness: .15em; }
+svg [data-ref-active] { outline: 2px dashed var(--pe-accent); outline-offset: 4px; }
+svg [data-ref-active] .pe-ref-mark { stroke: var(--pe-accent); stroke-width: 3; }
+.pe-hint, .pe-boundary { color: var(--pe-muted); }
+@media (max-width: 45rem) {
+  /* Keep each visual immediately beside its explanation in DOM order. */
+  .pe-pair { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .pe-page main { padding: 1.25rem 1rem 3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pe-pair *, .pe-pair *::before, .pe-pair *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media print {
+  :root { color-scheme: light; --pe-bg: #fff; --pe-surface: #fff; --pe-text: #111; --pe-muted: #333; --pe-border: #777; --pe-accent: #111; --pe-tint: #fff; }
+  .pe-page main { padding: 0; }
+  .pe-pair { grid-template-columns: minmax(0, 1fr); }
+  .pe-controls, .pe-hint, [data-step-controls] { display: none !important; }
+  .pe-visual, .pe-explanation { break-inside: avoid; }
+  .pe-stage { max-width: 34rem; }
+  svg [data-ref-active] { outline: none; }
+  .pe-ref[data-ref-active], .pe-explanation [data-ref-active] { background: none; }
+}

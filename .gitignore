@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+shots/
+test-results/
+playwright-report/
+__pycache__/
+*.pyc

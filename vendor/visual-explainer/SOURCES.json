@@ -1,0 +1,44 @@
+{
+  "project": "visual-explainer",
+  "repository": "https://github.com/nicobailon/visual-explainer",
+  "commit": "69cd7395cee2979aa7301ebe51bb4c2ba5f5ef9e",
+  "retrieved": "2026-10-16",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2025 Nico Bailon",
+  "reviewed_sources": [
+    {
+      "path": "LICENSE",
+      "sha256": "871b3c6c64e030c0647ca33543716bdae9511ae2d6a85d6f4ce63783bab52c8f",
+      "url": "https://github.com/nicobailon/visual-explainer/blob/69cd7395cee2979aa7301ebe51bb4c2ba5f5ef9e/LICENSE"
+    },
+    {
+      "path": "plugins/visual-explainer/SKILL.md",
+      "sha256": "958e929db85fab07f5cc549a2cceb5941017cf93175b37391d0cdf36b16df6e1",
+      "url": "https://github.com/nicobailon/visual-explainer/blob/69cd7395cee2979aa7301ebe51bb4c2ba5f5ef9e/plugins/visual-explainer/SKILL.md"
+    },
+    {
+      "path": "plugins/visual-explainer/references/diagrams.md",
+      "sha256": "74c98b47178550cfd80257c43272febc0897097ccbcde92b247c2511b15c8391",
+      "url": "https://github.com/nicobailon/visual-explainer/blob/69cd7395cee2979aa7301ebe51bb4c2ba5f5ef9e/plugins/visual-explainer/references/diagrams.md"
+    },
+    {
+      "path": "plugins/visual-explainer/templates/page.html",
+      "sha256": "bb52edc3af0c30219ea91e8b13d9ce1166dc2cfbf2215614c99d1c2e82197b6b",
+      "url": "https://github.com/nicobailon/visual-explainer/blob/69cd7395cee2979aa7301ebe51bb4c2ba5f5ef9e/plugins/visual-explainer/templates/page.html"
+    },
+    {
+      "path": "plugins/visual-explainer/references/style-guide.md",
+      "sha256": "ec6b85b66ae76436a64ba5dae70be4f532d497b506aaa8db9d4bff398f2d29fc",
+      "url": "https://github.com/nicobailon/visual-explainer/blob/69cd7395cee2979aa7301ebe51bb4c2ba5f5ef9e/plugins/visual-explainer/references/style-guide.md"
+    }
+  ],
+  "vendored_files": [
+    "LICENSE"
+  ],
+  "adapted_files": [
+    "assets/paired-explainer/paired-explainer.mjs",
+    "assets/paired-explainer/paired-explainer.css",
+    "assets/paired-explainer/template.html",
+    "references/paired-explanations.md"
+  ]
+}

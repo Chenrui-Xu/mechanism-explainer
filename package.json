@@ -1,0 +1,18 @@
+{
+  "name": "explain-with-models",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Clear technical prose, synchronized visual explanations, and Anatomy SVG tools in one agent skill.",
+  "type": "module",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/Chenrui-Xu/explain-with-models.git" },
+  "engines": { "node": ">=20.10" },
+  "scripts": {
+    "build": "node assets/paired-explainer/build.mjs && node examples/cache-key/build.mjs && node examples/spring-balance/build.mjs",
+    "test": "node --test tests/*.test.mjs examples/*/*.test.mjs",
+    "test:browser": "node --test --test-concurrency=1 tests/browser/*.test.mjs",
+    "preview": "node scripts/preview.mjs",
+    "validate": "node scripts/validate.mjs"
+  },
+  "devDependencies": { "playwright": "1.62.1" }
+}

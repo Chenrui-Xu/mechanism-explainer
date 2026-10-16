@@ -1,0 +1,22 @@
+{
+  "repository": "https://github.com/danyuchn/asd-ste100-skill",
+  "branch": "master",
+  "commit": "3944283c183eea13fe5bd902b572da3b4de8bf44",
+  "retrieved": "2026-10-16",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Dustin Yuchen Teng",
+  "files": [
+    {
+      "upstream": "scripts/ste-lint.py",
+      "local": "scripts/ste-lint.py",
+      "sha256": "32263de1b6b74cc3f83846ae8545ba6c57994db0ba1ec1c8d842c310427886d1",
+      "modified": false
+    },
+    {
+      "upstream": "LICENSE",
+      "local": "LICENSE",
+      "sha256": "d3c674e8592076c9021a59b55177adbcba6fd7e1710082becb922522b22ec672",
+      "modified": false
+    }
+  ]
+}

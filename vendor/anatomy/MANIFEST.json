@@ -1,0 +1,70 @@
+{
+  "source": "https://github.com/wheresryan22/anatomy",
+  "snapshot_date": "2026-10-16",
+  "version_basis": "Each unmodified file is verified byte-for-byte against this GitHub commit.",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Ryan",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "87c078ab9d90a3044f359e6b563d4e6afea7aa060897cf4f21618687b3856796",
+      "modified": false
+    },
+    {
+      "path": "kit/iso-kit.mjs",
+      "sha256": "6d3ecc725d30c3b0346da309cf61dfa5a65017c23620bbd4093009d4fb104018",
+      "modified": false
+    },
+    {
+      "path": "kit/iso-kit.ts",
+      "sha256": "e9fc988c61a11bfac1f097e62419915ea86b2130ab091f1b50c0e019c907e253",
+      "modified": false
+    },
+    {
+      "path": "kit/iso.css",
+      "sha256": "ef19bac5a42ba9be42b56b2c1cf7fc7e21d332a8060765e9ca1d987b8ab23924",
+      "modified": false
+    },
+    {
+      "path": "kit/lathe.mjs",
+      "sha256": "a4e7e974b1a37e603ad2b76363b6f9815cc101dfff0ad277a5d4e8f1dc56fccb",
+      "modified": false
+    },
+    {
+      "path": "kit/tube.mjs",
+      "sha256": "bcb3cc360f6d83e6a5753f4c464b4587ab7965028b05a5d58e285abce58667c9",
+      "modified": false
+    },
+    {
+      "path": "kit/audit.mjs",
+      "sha256": "74e605b5d549c1f31c8a1104db7560057105cf86809bf6ced00e4ac79194c8e2",
+      "modified": false
+    },
+    {
+      "path": "scripts/capture.mjs",
+      "sha256": "12e901efe79df75073eeeaf5462ac989a8e2892279253d27f8ee114c54be43d3",
+      "modified": false
+    },
+    {
+      "path": "scripts/drive.mjs",
+      "sha256": "49c22499827a2a5effb802513976bcb8b6dfced139bb4d677ff6e9edd2700eec",
+      "modified": false
+    },
+    {
+      "path": "scripts/lines.mjs",
+      "sha256": "b0ca73ab3a0d1cd4a28fda933496cbd7384ef315d821b5d2fffae1c704ce79cc",
+      "modified": false
+    },
+    {
+      "path": "scripts/chrome-port.mjs",
+      "sha256": "6775d3d389d26f37a52be8358aa88d1dc0aded63cb24ae20a936505a192e5d9d",
+      "modified": false
+    },
+    {
+      "path": "scripts/line-ends.mjs",
+      "sha256": "da79cc624c5bda0cb8af8f864dbe53026e44ca2377dab3665076ad570d804f42",
+      "modified": false
+    }
+  ],
+  "commit": "e9488296a44211c42701ff71705b7901470ec78f"
+}

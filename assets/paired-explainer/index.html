@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A queue holds a job until a worker accepts it</title>
+<style>
+/* Adapted layout/highlight patterns: visual-explainer, MIT, (c) 2025 Nico Bailon.
+   See ../../vendor/visual-explainer/. Local changes (c) 2026 Chenrui Xu, MIT. */
+:root {
+  color-scheme: light dark;
+  --pe-bg: #f7f7f4; --pe-surface: #fff; --pe-text: #17191c;
+  --pe-muted: #575c63; --pe-border: #848482; --pe-accent: #2c4cd0;
+  --pe-tint: #e9edff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pe-bg: #111316; --pe-surface: #181b1f; --pe-text: #e8e8e3;
+    --pe-muted: #b2b7bf; --pe-border: #848c94; --pe-accent: #acbaff;
+    --pe-tint: #252f53;
+  }
+}
+.pe-page { color: var(--pe-text); background: var(--pe-bg); font: 1rem/1.65 system-ui, sans-serif; margin: 0; }
+.pe-page * { box-sizing: border-box; }
+.pe-page main { max-width: 68rem; margin: auto; padding: 2rem 1.25rem 4rem; }
+.pe-page h1 { max-width: 28ch; line-height: 1.15; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.025em; }
+.pe-page p, .pe-page li { max-width: 65ch; }
+.pe-page a { color: var(--pe-accent); }
+.pe-pair { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.pe-pair > * { min-width: 0; }
+.pe-visual { margin: 0; }
+.pe-stage { background: var(--pe-surface); border: 1px solid var(--pe-border); border-radius: .5rem; padding: 1rem; }
+.pe-stage svg { width: 100%; height: auto; display: block; overflow: visible; }
+.pe-visual figcaption { margin-top: .75rem; font-size: .95rem; }
+.pe-explanation h2 { margin: 0 0 .5rem; font-size: 1.4rem; line-height: 1.35; }
+.pe-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 1rem 0; }
+.pe-controls button { font: inherit; color: var(--pe-text); background: var(--pe-surface); border: 1px solid var(--pe-border); border-radius: .25rem; padding: .5rem .75rem; min-height: 2.75rem; cursor: pointer; }
+.pe-controls button:disabled { cursor: default; opacity: .55; }
+.pe-controls input { min-width: 0; max-width: 100%; accent-color: var(--pe-accent); }
+.pe-controls label { display: flex; align-items: center; gap: .5rem; }
+.pe-position { font-variant-numeric: tabular-nums; }
+.pe-summary { margin-top: 2rem; border-top: 1px solid var(--pe-border); padding-top: 1rem; }
+.pe-page [hidden] { display: none !important; }
+.pe-page :focus-visible, .pe-pair :focus-visible { outline: 3px solid var(--pe-accent); outline-offset: 4px; }
+/* An underline/outline changes shape as well as color. Labels never fade out. */
+.pe-ref, .pe-explanation [data-ref] { text-decoration: underline dotted; text-underline-offset: .22em; cursor: default; }
+.pe-ref[data-ref-active], .pe-explanation [data-ref-active] { background: var(--pe-tint); text-decoration-style: solid; text-decoration-thickness: .15em; }
+svg [data-ref-active] { outline: 2px dashed var(--pe-accent); outline-offset: 4px; }
+svg [data-ref-active] .pe-ref-mark { stroke: var(--pe-accent); stroke-width: 3; }
+.pe-hint, .pe-boundary { color: var(--pe-muted); }
+@media (max-width: 45rem) {
+  /* Keep each visual immediately beside its explanation in DOM order. */
+  .pe-pair { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .pe-page main { padding: 1.25rem 1rem 3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pe-pair *, .pe-pair *::before, .pe-pair *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media print {
+  :root { color-scheme: light; --pe-bg: #fff; --pe-surface: #fff; --pe-text: #111; --pe-muted: #333; --pe-border: #777; --pe-accent: #111; --pe-tint: #fff; }
+  .pe-page main { padding: 0; }
+  .pe-pair { grid-template-columns: minmax(0, 1fr); }
+  .pe-controls, .pe-hint, [data-step-controls] { display: none !important; }
+  .pe-visual, .pe-explanation { break-inside: avoid; }
+  .pe-stage { max-width: 34rem; }
+  svg [data-ref-active] { outline: none; }
+  .pe-ref[data-ref-active], .pe-explanation [data-ref-active] { background: none; }
+}
+
+.queue-shape { fill: var(--pe-surface); stroke: var(--pe-border); stroke-width: 2; }
+.queue-label { fill: var(--pe-text); font: 600 22px system-ui, sans-serif; text-anchor: middle; }
+.queue-value { fill: var(--pe-muted); font: 20px system-ui, sans-serif; text-anchor: middle; }
+.queue-job { fill: var(--pe-tint); stroke: var(--pe-accent); stroke-width: 2; }
+.queue-arrow { fill: none; stroke: var(--pe-border); stroke-width: 2; }
+</style>
+</head>
+<body class="pe-page">
+<main id="queue-explainer">
+  <header>
+    <p>Paired explainer · reusable starter</p>
+    <h1>A queue holds a job until a worker accepts it.</h1>
+    <p>Accepting a job removes it from the <span class="pe-ref" data-ref="queue" tabindex="0">queue</span>.
+      The <span class="pe-ref" data-ref="worker" tabindex="0">worker</span> still has to finish the job.</p>
+  </header>
+  <section class="pe-pair" aria-label="Queue and its current explanation">
+    <figure class="pe-visual">
+      <div class="pe-stage">
+        <svg viewBox="0 0 510 250" role="group" aria-labelledby="queue-figure-title queue-figure-description">
+          <title id="queue-figure-title">A queue and one worker</title>
+          <desc id="queue-figure-description">The queue holds waiting jobs. The worker holds an active job after accepting it. Current values are shown below each label and in the adjacent explanation.</desc>
+          <defs><marker id="queue-arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="var(--pe-border)"/></marker></defs>
+          <path class="queue-arrow" d="M205 127H300" marker-end="url(#queue-arrowhead)"/>
+          <text class="queue-value" x="255" y="105">accepts</text>
+          <g data-ref="queue" tabindex="0" role="group" aria-label="Queue, holds waiting jobs">
+            <rect class="queue-shape pe-ref-mark" x="15" y="35" width="190" height="180" rx="6"/>
+            <text class="queue-label" x="110" y="72">Queue</text>
+            <rect data-queue-job class="queue-job" x="87" y="96" width="46" height="46" rx="3" visibility="hidden"/>
+            <text class="queue-value" data-queue-count x="110" y="184">0 waiting</text>
+          </g>
+          <g data-ref="worker" tabindex="0" role="group" aria-label="Worker, runs an accepted job">
+            <rect class="queue-shape pe-ref-mark" x="305" y="35" width="190" height="180" rx="6"/>
+            <text class="queue-label" x="400" y="72">Worker</text>
+            <rect data-worker-job class="queue-job" x="377" y="96" width="46" height="46" rx="3" visibility="hidden"/>
+            <text class="queue-value" data-worker-state x="400" y="184">Idle</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Fig. 1. The current state shows where the job waits or runs. An outlined square represents one job.</figcaption>
+    </figure>
+    <div class="pe-explanation">
+      <h2 data-step-title>Before a job arrives</h2>
+      <p>Look at the <span data-ref="queue" tabindex="0">queue</span> and the <span data-ref="worker" tabindex="0">worker</span>.</p>
+      <p role="status" aria-live="polite" aria-atomic="true" data-explanation>The queue has 0 waiting jobs, and the worker is idle. No job has arrived yet.</p>
+      <div class="pe-controls" data-step-controls hidden aria-label="Inspect the sequence">
+        <button type="button" data-step-go="-1">Previous</button>
+        <span class="pe-position" data-step-status>1 / 3</span>
+        <button type="button" data-step-go="1">Next</button>
+        <button type="button" data-step-reset>Reset</button>
+        <label>Step <input data-step-index type="range" min="0" max="2" step="1" value="0"></label>
+      </div>
+      <p class="pe-hint">Use Next or the step slider. Focus or hover a named part to highlight its matching text and shape.</p>
+      <noscript><p>The first state is shown. Read all three states below; no interaction is needed.</p></noscript>
+    </div>
+  </section>
+  <section class="pe-summary" aria-labelledby="sequence-title">
+    <h2 id="sequence-title">All three states</h2>
+    <ol><li>The queue has 0 waiting jobs, and the worker is idle. No job has arrived yet.</li>
+<li>One job has arrived. The worker has not accepted it yet, so the queue has 1 waiting job.</li>
+<li>The worker accepts the job, so the queue has 0 waiting jobs. The job is active; it is not finished yet.</li></ol>
+    <p class="pe-boundary">Illustrative sequence: one queue, one worker, one job. It omits retries, failures, timing, and concurrent workers.</p>
+  </section>
+</main>
+<!-- Upstream patterns: visual-explainer (c) 2025 Nico Bailon, MIT.
+     Adaptation: Explain with Models (c) 2026 Chenrui Xu, MIT.
+     Full notice is distributed in vendor/visual-explainer/LICENSE. -->
+<script>
+/*
+MIT License
+
+Copyright (c) 2025 Nico Bailon
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+/*
+ * Paired explanation primitives, adapted from visual-explainer's linked
+ * highlighting and stepper patterns. Upstream Copyright (c) 2025 Nico Bailon.
+ * MIT license and pinned provenance: ../../vendor/visual-explainer/.
+ * Integration changes Copyright (c) 2026 Chenrui Xu. MIT.
+ */
+
+/** Space-separated concept IDs, deduplicated without treating IDs as CSS. */
+function referenceIds(value = '') {
+  return [...new Set(String(value).trim().split(/\s+/).filter(Boolean))];
+}
+
+function sharesReference(value, activeIds) {
+  const active = new Set(activeIds);
+  return referenceIds(value).some((id) => active.has(id));
+}
+
+/**
+ * Link every [data-ref] within root. Works with SVG and HTML and with content
+ * replaced by render(). Hover and focus are additive; leaving the pointer
+ * does not erase the keyboard's highlight. No essential text is hidden.
+ */
+function wireReferences(root) {
+  let hovered = null;
+  let focused = null;
+  const within = (target) => {
+    const element = target?.closest?.('[data-ref]');
+    return element && root.contains(element) ? element : null;
+  };
+  const paint = () => {
+    if (hovered && !root.contains(hovered)) hovered = null;
+    if (focused && !root.contains(focused)) focused = null;
+    const active = new Set([
+      ...referenceIds(hovered?.getAttribute('data-ref') || ''),
+      ...referenceIds(focused?.getAttribute('data-ref') || ''),
+    ]);
+    for (const element of root.querySelectorAll('[data-ref]')) {
+      element.toggleAttribute('data-ref-active', sharesReference(element.getAttribute('data-ref'), active));
+    }
+  };
+  const handlers = {
+    pointerover: (event) => { hovered = within(event.target); paint(); },
+    pointerout: (event) => { hovered = within(event.relatedTarget); paint(); },
+    focusin: (event) => { focused = within(event.target); paint(); },
+    focusout: (event) => { focused = within(event.relatedTarget); paint(); },
+  };
+  for (const [name, handler] of Object.entries(handlers)) root.addEventListener(name, handler);
+  return {
+    refresh: paint,
+    destroy() {
+      for (const [name, handler] of Object.entries(handlers)) root.removeEventListener(name, handler);
+      hovered = focused = null;
+      paint();
+    },
+  };
+}
+
+/** Pure, bounded sequence controller. It never starts a timer. */
+function createStepper({ steps, initial = 0, onChange = () => {} }) {
+  if (!Array.isArray(steps) || steps.length === 0) throw new TypeError('steps must be a non-empty array');
+  if (typeof onChange !== 'function') throw new TypeError('onChange must be a function');
+  const sequence = [...steps];
+  const bounded = (value) => {
+    if (!Number.isFinite(value)) throw new TypeError('step index must be finite');
+    return Math.max(0, Math.min(sequence.length - 1, Math.trunc(value)));
+  };
+  let index = bounded(initial);
+  const getState = () => Object.freeze({
+    index, step: sequence[index], total: sequence.length,
+    canPrevious: index > 0, canNext: index < sequence.length - 1,
+  });
+  const go = (value) => {
+    const next = bounded(value);
+    if (next !== index) { index = next; onChange(getState()); }
+    return getState();
+  };
+  return { getState, go, next: () => go(index + 1), previous: () => go(index - 1), reset: () => go(0) };
+}
+
+/**
+ * Enhance static HTML with a sequence and linked references.
+ * render(snapshot, root) is the only place that renders factual state.
+ * It runs once initially, then once for each actual index change.
+ */
+function mountStepper(root, {
+  steps, initial = 0, render,
+  describePosition = (index, total) => `${index + 1} / ${total}`,
+}) {
+  if (typeof render !== 'function') throw new TypeError('render must be a function');
+  const references = wireReferences(root);
+  const paint = (state) => {
+    render(state, root);
+    for (const node of root.querySelectorAll('[data-step-status]')) node.textContent = describePosition(state.index, state.total);
+    for (const button of root.querySelectorAll('[data-step-go]')) {
+      const direction = Number(button.getAttribute('data-step-go'));
+      button.disabled = direction < 0 ? !state.canPrevious : !state.canNext;
+    }
+    for (const slider of root.querySelectorAll('[data-step-index]')) {
+      slider.min = '0'; slider.max = String(state.total - 1); slider.step = '1';
+      slider.value = String(state.index);
+      slider.setAttribute('aria-valuetext', describePosition(state.index, state.total));
+    }
+    references.refresh();
+  };
+  const controller = createStepper({ steps, initial, onChange: paint });
+  // Leave useful static content and hidden controls intact if initial render fails.
+  try { paint(controller.getState()); } catch (error) { references.destroy(); throw error; }
+  const click = (event) => {
+    const button = event.target?.closest?.('[data-step-go], [data-step-reset]');
+    if (!button || !root.contains(button) || button.disabled) return;
+    if (button.hasAttribute('data-step-reset')) controller.reset();
+    else controller.go(controller.getState().index + Number(button.getAttribute('data-step-go')));
+  };
+  const input = (event) => {
+    const slider = event.target?.closest?.('[data-step-index]');
+    if (slider && root.contains(slider)) controller.go(Number(slider.value));
+  };
+  root.addEventListener('click', click);
+  root.addEventListener('input', input);
+  root.setAttribute('data-enhanced', '');
+  for (const control of root.querySelectorAll('[data-step-controls]')) control.hidden = false;
+  return {
+    ...controller,
+    refreshReferences: references.refresh,
+    destroy() {
+      root.removeEventListener('click', click);
+      root.removeEventListener('input', input);
+      references.destroy();
+      root.removeAttribute('data-enhanced');
+      for (const control of root.querySelectorAll('[data-step-controls]')) control.hidden = true;
+    },
+  };
+}
+
+// Original illustrative model. Each event is a state the reader can inspect.
+const queueSteps = Object.freeze([
+  Object.freeze({ title: 'Before a job arrives', queued: 0, busy: false }),
+  Object.freeze({ title: 'The job waits in the queue', queued: 1, busy: false }),
+  Object.freeze({ title: 'The worker accepts the job', queued: 0, busy: true }),
+]);
+
+function queueView(step) {
+  return Object.freeze({
+    title: step.title,
+    count: `${step.queued} waiting`,
+    worker: step.busy ? '1 active job' : 'Idle',
+    queueJobVisible: step.queued > 0,
+    workerJobVisible: step.busy,
+    explanation: step.busy
+      ? 'The worker accepts the job, so the queue has 0 waiting jobs. The job is active; it is not finished yet.'
+      : step.queued > 0
+        ? 'One job has arrived. The worker has not accepted it yet, so the queue has 1 waiting job.'
+        : 'The queue has 0 waiting jobs, and the worker is idle. No job has arrived yet.',
+  });
+}
+
+mountStepper(document.getElementById('queue-explainer'), {
+  steps: queueSteps,
+  render({ step }, root) {
+    const view = queueView(step);
+    root.querySelector('[data-step-title]').textContent = view.title;
+    root.querySelector('[data-queue-count]').textContent = view.count;
+    root.querySelector('[data-worker-state]').textContent = view.worker;
+    root.querySelector('[data-explanation]').textContent = view.explanation;
+    root.querySelector('[data-queue-job]').setAttribute('visibility', view.queueJobVisible ? 'visible' : 'hidden');
+    root.querySelector('[data-worker-job]').setAttribute('visibility', view.workerJobVisible ? 'visible' : 'hidden');
+  },
+});
+</script>
+</body>
+</html>
