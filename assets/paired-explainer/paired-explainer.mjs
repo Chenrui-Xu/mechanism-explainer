@@ -2,7 +2,7 @@
  * Paired explanation primitives, adapted from visual-explainer's linked
  * highlighting and stepper patterns. Upstream Copyright (c) 2025 Nico Bailon.
  * MIT license and pinned provenance: ../../vendor/visual-explainer/.
- * Integration changes Copyright (c) 2026 Chenrui Xu. MIT.
+ * Integration changes Copyright (c) 2026 Mechanism Explainer contributors. MIT.
  */
 
 /** Space-separated concept IDs, deduplicated without treating IDs as CSS. */

@@ -1,7 +1,7 @@
 # Attribution and provenance
 
 Mechanism Explainer integrates three public MIT-licensed projects. The source
-revisions below were pinned for v0.1.0 and remain unchanged in v0.2.0.
+revisions below were pinned for v0.1.0 and remain unchanged in v0.2.1.
 Unmodified files retain their upstream
 notices; adapted components identify their source and the integration changes.
 
@@ -69,7 +69,7 @@ work that uses the bundled kit; it is not an upstream Anatomy example.
 The combined skill workflow, integration-specific documentation, evaluation
 cases, tests, cache-key example, and spring-balance example were prepared for
 this project. Original contributions and adaptation changes are copyright
-(c) 2026 Chenrui Xu under the repository's [MIT License](LICENSE). This notice
+(c) 2026 Mechanism Explainer contributors under the repository's [MIT License](LICENSE). This notice
 does not replace upstream copyright notices for reused work.
 
 The project began with a request to combine the ideas of the local

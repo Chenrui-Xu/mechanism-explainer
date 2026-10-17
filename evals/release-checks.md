@@ -3,6 +3,13 @@
 This records implementation checks and an agent trial,
 not a human learning study or a guarantee about future generated explanations.
 
+## v0.2.1: Project attribution
+
+The project's own notices and gallery footer now credit Mechanism Explainer
+contributors. Third-party notices remain unchanged. Repository owner URLs and
+installation commands retain the GitHub account path. No model or interaction
+logic changed. The examples and site rebuilt, and the release validator passed.
+
 ## v0.2.0: Mechanism Explainer
 
 Checked on 2026-10-16. The project is now named Mechanism Explainer, with the

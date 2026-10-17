@@ -169,7 +169,7 @@ preview screenshots in English. The validator checks distributed text and HTML
 language declarations. Generated explanations default to English; an explicit
 user request can select another language.
 
-Original work is copyright (c) 2026 Chenrui Xu under the [MIT License](LICENSE).
+Original work is copyright (c) 2026 Mechanism Explainer contributors under the [MIT License](LICENSE).
 The three upstream projects retain their MIT notices and pinned provenance;
 see [ATTRIBUTION.md](ATTRIBUTION.md) and the
 [source comparison](references/public-sources.md). This project is independent
