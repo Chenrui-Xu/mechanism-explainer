@@ -34,10 +34,10 @@ Choose stable IDs for the concepts that need visible anchors. For example:
 
 ```text
 concept: model-version
-label: 模型版本
+label: Model version
 source: explicitly defined toy cache key
 view: second key slot
-control: “模型变化” preset button
+control: “Model changed” preset button
 state: current.modelVersion
 explanation: the stored and current model versions differ, so this example recomputes
 ```

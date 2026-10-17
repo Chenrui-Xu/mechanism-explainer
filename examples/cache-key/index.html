@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="一个图文同步的缓存键示例：比较文档版本和模型版本，判断能否复用已有结果。">
-  <title>两项都匹配，才复用 · Explain with Models</title>
+  <meta name="description" content="An interactive cache-key example: compare document and model versions to decide whether a stored result can be reused.">
+  <title>Reuse requires both versions to match · Explain with Models</title>
   <style>
     :root { color-scheme: light; --paper: #f6f5f0; --surface: #fffefa; --ink: #25332f; --muted: #60716a; --line: #d4dcd4; --green: #176650; --green-soft: #e3f0e8; --orange: #975128; --orange-soft: #fbecde; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
     main { max-width: 1180px; margin: auto; padding: 48px 28px 36px; }
     .eyebrow { margin: 0 0 16px; color: var(--muted); font: 600 12px/1.5 ui-monospace, monospace; letter-spacing: .13em; }
     h1 { margin: 0 0 16px; font-size: clamp(30px, 5vw, 48px); letter-spacing: -.04em; line-height: 1.2; }
@@ -51,7 +51,7 @@
     .slot[data-match="false"] .incoming { transform: translate(0, -10px); }
     #cache-lamp { fill: var(--green); }
     #cache[data-reuse="false"] #cache-lamp { fill: var(--orange); }
-    #cache-result { font-size: 22px; font-weight: 600; fill: var(--green); }
+    #cache-result { font-size: 23px; font-weight: 600; fill: var(--green); }
     #cache[data-reuse="false"] #cache-result { fill: var(--orange); }
     figcaption { margin: 4px 8px 0; font-size: 13px; color: var(--muted); }
     .explanation { padding: 30px 28px; border-left: 1px solid var(--line); display: flex; flex-direction: column; justify-content: center; min-width: 0; }
@@ -103,27 +103,27 @@
 <main>
   <header>
     <p class="eyebrow">EXPLAIN WITH MODELS / 01</p>
-    <h1>两项都匹配，才复用</h1>
-    <p class="thesis">缓存还在，而且文档版本、模型版本都匹配时，才复用结果。</p>
-    <p class="definition">缓存是保存的旧结果。缓存键是一组识别值。本例定义：<code>键 =（文档版本，模型版本）</code>。示例固定有缓存，并忽略过期与淘汰。</p>
+    <h1>Reuse requires both versions to match</h1>
+    <p class="thesis">Reuse the stored result only if it exists and both the document version and the model version match.</p>
+    <p class="definition">A cache holds a previously calculated result. Its key identifies that result. Here, <code>key = (document version, model version)</code>. The example assumes the cache entry exists and ignores expiry and eviction.</p>
   </header>
 
-  <section class="explainer" aria-label="缓存键交互示例">
+  <section class="explainer" aria-label="Interactive cache-key example">
     <div class="controls">
-      <p id="preset-label">改变一项，看看结果</p>
+      <p id="preset-label">Change one version</p>
       <div class="presets" role="group" aria-labelledby="preset-label">
-        <button type="button" data-preset="match" aria-pressed="true" disabled>两项匹配</button>
-        <button type="button" data-preset="document" aria-pressed="false" disabled>文档变化</button>
-        <button type="button" data-preset="model" aria-pressed="false" disabled>模型变化</button>
+        <button type="button" data-preset="match" aria-pressed="true" disabled>Both match</button>
+        <button type="button" data-preset="document" aria-pressed="false" disabled>Document +1</button>
+        <button type="button" data-preset="model" aria-pressed="false" disabled>Model +1</button>
       </div>
     </div>
-    <noscript><p>当前显示两项匹配的静态示例。启用 JavaScript 后，可以切换三个案例。</p></noscript>
+    <noscript><p>The static example shows both versions matching. Enable JavaScript to compare all three cases.</p></noscript>
     <div class="stage">
       <figure>
-        <div class="figure-meta"><span>FIG. 01 / 两个比对槽</span><span>已有缓存键 (3, 2)</span></div>
+        <div class="figure-meta"><span>FIG. 01 / VERSION CHECKS</span><span>Stored key (3, 2)</span></div>
         <svg xmlns="http://www.w3.org/2000/svg" id="diagram" viewBox="0 0 640 460" role="img" aria-labelledby="diagram-title diagram-description">
-          <title id="diagram-title">文档版本和模型版本的两个比对槽</title>
-          <desc id="diagram-description">当前键为 (3,2)，已有缓存键为 (3,2)。两项版本都匹配，缓存存在，可以复用。绿色实线连接到缓存盒。</desc>
+          <title id="diagram-title">Two slots compare the document version and model version</title>
+          <desc id="diagram-description">The current key is (3, 2), and the stored cache key is (3, 2). Both versions match and the cache entry exists, so the result can be reused. Solid green lines connect both comparisons to the cache.</desc>
           <defs>
             <filter id="shadow" x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="8" /></filter>
           </defs>
@@ -140,11 +140,11 @@
           <path id="document-wire" class="wire active" d="M326 204H373V251H427" />
           <path id="model-wire" class="wire active" d="M326 322H391V277H427" />
           <g fill="#fafcf5" stroke="#82968a" stroke-width="2"><circle cx="326" cy="204" r="6" /><circle cx="326" cy="322" r="6" /><circle cx="427" cy="251" r="6" /><circle cx="427" cy="277" r="6" /></g>
-          <text class="svg-small" x="139" y="110" text-anchor="middle">当前值</text>
-          <text class="svg-small" x="274" y="110" text-anchor="middle">缓存值</text>
+          <text class="svg-small" x="139" y="110" text-anchor="middle">Current</text>
+          <text class="svg-small" x="274" y="110" text-anchor="middle">Stored</text>
           <!-- Document comparator. -->
           <g class="slot" id="document-slot" data-match="true">
-            <text class="svg-label" x="118" y="151">文档版本</text>
+            <text class="svg-label" x="118" y="151">Document</text>
             <path d="M112 175H325V239H112Z" fill="#d8e0d2" stroke="#a8b5a3" stroke-width="2" />
             <path d="M112 175 99 164H312L325 175" fill="#edf1e7" stroke="#a8b5a3" stroke-width="2" />
             <g class="incoming">
@@ -162,7 +162,7 @@
           </g>
           <!-- Model comparator. -->
           <g class="slot" id="model-slot" data-match="true">
-            <text class="svg-label" x="118" y="269">模型版本</text>
+            <text class="svg-label" x="118" y="269">Model</text>
             <path d="M112 293H325V357H112Z" fill="#d8e0d2" stroke="#a8b5a3" stroke-width="2" />
             <path d="M112 293 99 282H312L325 293" fill="#edf1e7" stroke="#a8b5a3" stroke-width="2" />
             <g class="incoming">
@@ -180,58 +180,58 @@
           </g>
           <!-- Cache drawer: its status is derived from the same decision as the prose. -->
           <g id="cache" data-reuse="true">
-            <path d="M428 208 403 184H533L558 208Z" fill="#e3eadc" stroke="#8e9f87" stroke-width="2" />
+            <path d="M428 208 403 184H571L596 208Z" fill="#e3eadc" stroke="#8e9f87" stroke-width="2" />
             <path d="M403 184 428 208V334L403 310Z" fill="#a9baa0" stroke="#8e9f87" stroke-width="2" />
-            <rect x="428" y="208" width="130" height="126" rx="3" fill="#cbd8c1" stroke="#8e9f87" stroke-width="2" />
-            <rect x="441" y="223" width="104" height="97" rx="3" fill="#f7f9f0" stroke="#9eaf94" stroke-width="2" />
-            <path d="M470 303H516V312H470Z" fill="#b0bfa7" stroke="#8e9f87" stroke-width="2" />
+            <rect x="428" y="208" width="168" height="126" rx="3" fill="#cbd8c1" stroke="#8e9f87" stroke-width="2" />
+            <rect id="cache-screen" x="441" y="223" width="142" height="97" rx="3" fill="#f7f9f0" stroke="#9eaf94" stroke-width="2" />
+            <path d="M489 303H535V312H489Z" fill="#b0bfa7" stroke="#8e9f87" stroke-width="2" />
             <circle id="cache-lamp" cx="459" cy="242" r="5" />
-            <text x="474" y="249" font-size="23">有缓存</text>
-            <text id="cache-result" x="493" y="282" text-anchor="middle">复用</text>
-            <text class="svg-small" x="491" y="363" text-anchor="middle">已有 (3, 2)</text>
+            <text x="474" y="249" font-size="23">Exists</text>
+            <text id="cache-result" x="512" y="282" text-anchor="middle">Reuse</text>
+            <text class="svg-small" x="512" y="363" text-anchor="middle">Key (3, 2)</text>
           </g>
         </svg>
-        <figcaption>编号对应文字检查项。错开的卡位表示该字段不匹配。</figcaption>
+        <figcaption>Each row compares version numbers. Its number matches the checklist. A raised tile marks a mismatch.</figcaption>
       </figure>
 
       <div class="explanation" id="explanation" data-reuse="true" aria-labelledby="result-title">
-        <p class="current-label">当前键 <span class="number" id="current-key">(3, 2)</span> · 已有缓存</p>
-        <h2 class="result" id="result-title">可以复用旧结果</h2>
-        <p class="reason" id="reason">两项版本都匹配。这个请求可以直接使用已有结果。</p>
+        <p class="current-label">Current key <span class="number" id="current-key">(3, 2)</span> · Entry exists</p>
+        <h2 class="result" id="result-title">Reuse the stored result</h2>
+        <p class="reason" id="reason">Both versions match. This request can reuse the stored result.</p>
         <ol class="checks">
           <li id="document-check" data-match="true">
             <span class="step-number" aria-hidden="true">1</span>
-            <div><span class="check-title">文档版本</span><span class="check-detail" id="document-detail">当前 3 = 缓存 3 · 匹配</span></div>
+            <div><span class="check-title">Document version</span><span class="check-detail" id="document-detail">Current 3 = stored 3 · Match</span></div>
           </li>
           <li id="model-check" data-match="true">
             <span class="step-number" aria-hidden="true">2</span>
-            <div><span class="check-title">模型版本</span><span class="check-detail" id="model-detail">当前 2 = 缓存 2 · 匹配</span></div>
+            <div><span class="check-title">Model version</span><span class="check-detail" id="model-detail">Current 2 = stored 2 · Match</span></div>
           </li>
         </ol>
       </div>
     </div>
-    <div class="rule"><p><strong>判断规则：</strong>缓存存在 <strong>并且</strong> 两项版本匹配 → 复用。否则 → 重新计算。</p></div>
+    <div class="rule"><p><strong>Rule:</strong> The cache entry exists <strong>and</strong> both versions match → reuse. Otherwise → recompute.</p></div>
     <div id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   </section>
 
   <div class="details-grid">
     <details>
-      <summary>类比边界：卡位没有解释什么？</summary>
-      <p>两个比对槽只表示两次相等比较。连接线表示两个条件都必须成立；它不表示数据传输顺序。</p>
-      <p>缓存是数据，不是真实的机械盒。本例固定保存键 <code>(3, 2)</code>，只展示判断，不执行计算，也不写入新缓存。</p>
-      <p>真实缓存还可能检查过期时间、淘汰状态或其他条件。本例忽略这些规则，不能据此判断所有缓存系统。</p>
-      <p>键还必须覆盖影响结果的相关输入。如果遗漏了一个输入，即使这两项匹配，也不能保证旧结果仍然正确。</p>
+      <summary>What the comparison slots do not explain</summary>
+      <p>The two slots represent two equality checks. The connecting lines mean both conditions must hold; they do not show the order of data transfer.</p>
+      <p>A cache stores data; it is not a physical box. This example fixes the stored key at <code>(3, 2)</code>. It shows the reuse decision without running a calculation or writing a new cache entry.</p>
+      <p>A real cache may also check expiry, eviction, or other conditions. This example omits those rules and does not describe every cache system.</p>
+      <p>The key must also cover the inputs that affect the result. If it omits a relevant input, matching these two versions alone does not guarantee that the stored result is still correct.</p>
     </details>
     <section class="question" aria-labelledby="question-title">
-      <h2 id="question-title">先预测，再看答案</h2>
-      <p>如果两项版本都匹配，但缓存已被删除，还能复用吗？</p>
+      <h2 id="question-title">Predict, then check</h2>
+      <p>If both versions match but the cache entry has been deleted, can this request reuse the result?</p>
       <details>
-        <summary>显示答案</summary>
-        <p><strong>不能。</strong>“缓存存在”也是必要条件。没有旧结果，就要重新计算。</p>
+        <summary>Show the answer</summary>
+        <p><strong>No.</strong> The cache entry must also exist. Without a stored result, this request needs a new calculation.</p>
       </details>
     </section>
   </div>
-  <p class="model-note">这是自包含的玩具模型。示例代码和 SVG 均为原创，无网络请求、无自动播放。</p>
+  <p class="model-note">This is a self-contained toy model. Its example code and SVG are original. It makes no network requests and never advances automatically.</p>
 </main>
 <script>
 function evaluateCache(current, stored) {
@@ -239,11 +239,11 @@ function evaluateCache(current, stored) {
     const modelMatches = current.modelVersion === stored.modelVersion;
     const reuse = stored.exists && documentMatches && modelMatches;
     let reason;
-    if (!stored.exists) reason = '缓存不存在。没有旧结果可以复用，需要重新计算。';
-    else if (documentMatches && modelMatches) reason = '两项版本都匹配。这个请求可以直接使用已有结果。';
-    else if (!documentMatches && !modelMatches) reason = '两项版本都变化了。已有结果不满足本例的复用规则，需要重新计算。';
-    else if (!documentMatches) reason = '文档版本从 ' + stored.documentVersion + ' 变为 ' + current.documentVersion + '。模型版本虽然匹配，仍然需要重新计算。';
-    else reason = '模型版本从 ' + stored.modelVersion + ' 变为 ' + current.modelVersion + '。文档版本虽然匹配，仍然需要重新计算。';
+    if (!stored.exists) reason = 'The cache entry does not exist. There is no stored result to reuse, so this request needs a new calculation.';
+    else if (documentMatches && modelMatches) reason = 'Both versions match. This request can reuse the stored result.';
+    else if (!documentMatches && !modelMatches) reason = 'Both versions differ. The stored result does not meet the reuse rule in this example, so this request needs a new calculation.';
+    else if (!documentMatches) reason = 'The document version changed from ' + stored.documentVersion + ' to ' + current.documentVersion + '. The model version matches, but this request still needs a new calculation.';
+    else reason = 'The model version changed from ' + stored.modelVersion + ' to ' + current.modelVersion + '. The document version matches, but this request still needs a new calculation.';
     return Object.freeze({ documentMatches, modelMatches, reuse, reason });
   }
 'use strict';
@@ -260,13 +260,13 @@ function evaluateCache(current, stored) {
     const current = presets[name];
     const decision = evaluateCache(current, storedCache);
     const key = '(' + current.documentVersion + ', ' + current.modelVersion + ')';
-    const title = decision.reuse ? '可以复用旧结果' : '需要重新计算';
+    const title = decision.reuse ? 'Reuse the stored result' : 'Recompute the result';
     element('current-key').textContent = key;
     element('result-title').textContent = title;
     element('reason').textContent = decision.reason;
     element('explanation').dataset.reuse = String(decision.reuse);
     element('cache').dataset.reuse = String(decision.reuse);
-    element('cache-result').textContent = decision.reuse ? '复用' : '不复用';
+    element('cache-result').textContent = decision.reuse ? 'Reuse' : 'Recompute';
     for (const [field, value, cached, matches] of [
       ['document', current.documentVersion, storedCache.documentVersion, decision.documentMatches],
       ['model', current.modelVersion, storedCache.modelVersion, decision.modelMatches]
@@ -276,12 +276,12 @@ function evaluateCache(current, stored) {
       element(field + '-slot').dataset.match = String(matches);
       element(field + '-check').dataset.match = String(matches);
       element(field + '-wire').setAttribute('class', 'wire ' + (matches ? 'active' : 'inactive'));
-      element(field + '-detail').textContent = '当前 ' + value + (matches ? ' = ' : ' ≠ ') + '缓存 ' + cached + (matches ? ' · 匹配' : ' · 不匹配');
+      element(field + '-detail').textContent = 'Current ' + value + (matches ? ' = ' : ' ≠ ') + 'stored ' + cached + (matches ? ' · Match' : ' · Mismatch');
     }
-    element('diagram-description').textContent = '当前键为 ' + key + '，已有缓存键为 (3, 2)。' + title + '。' + decision.reason;
+    element('diagram-description').textContent = 'The current key is ' + key + '. The stored cache key is (3, 2). ' + title + '. ' + decision.reason;
     for (const button of presetButtons) button.setAttribute('aria-pressed', String(button.dataset.preset === name));
     // Only user actions write to this live region. There is no per-frame announcement.
-    if (announce) element('announcement').textContent = '当前键 ' + key + '。' + title + '。' + decision.reason;
+    if (announce) element('announcement').textContent = 'Current key ' + key + '. ' + title + '. ' + decision.reason;
   }
   for (const button of presetButtons) {
     button.disabled = false;

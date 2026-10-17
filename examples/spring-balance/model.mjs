@@ -5,10 +5,10 @@ export const springLimits = Object.freeze({
 });
 
 export const springPresets = Object.freeze([
-  { id: 'baseline', label: '基准：6 N', forceN: 6, stiffnessNm: 300 },
-  { id: 'double-force', label: '拉力加倍', forceN: 12, stiffnessNm: 300 },
-  { id: 'double-stiffness', label: '刚度加倍', forceN: 6, stiffnessNm: 600 },
-  { id: 'zero-force', label: '没有拉力', forceN: 0, stiffnessNm: 300 },
+  { id: 'baseline', label: 'Baseline: 6 N', forceN: 6, stiffnessNm: 300 },
+  { id: 'double-force', label: 'Double force', forceN: 12, stiffnessNm: 300 },
+  { id: 'double-stiffness', label: 'Double stiffness', forceN: 6, stiffnessNm: 600 },
+  { id: 'zero-force', label: 'Zero force', forceN: 0, stiffnessNm: 300 },
 ]);
 
 /** Static equilibrium of an ideal, linear extension spring; no dynamics. */

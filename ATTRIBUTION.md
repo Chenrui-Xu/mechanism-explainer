@@ -1,7 +1,8 @@
 # Attribution and provenance
 
 Explain with Models integrates three public MIT-licensed projects. The source
-revisions below are pinned for v0.1.0. Unmodified files retain their upstream
+revisions below were pinned for v0.1.0 and remain unchanged in v0.1.1.
+Unmodified files retain their upstream
 notices; adapted components identify their source and the integration changes.
 
 ## STE-inspired writing and checker

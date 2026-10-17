@@ -41,11 +41,13 @@ for (const width of [1280, 390]) {
   test(`cache presets agree with the graphic and explanation at ${width}px`, async () => {
     const { context, page, errors, external } = await openPage('/cache-key/', { viewport: { width, height: 900 } });
     try {
+      assert.equal(await page.locator('html').getAttribute('lang'), 'en');
+      assert.doesNotMatch(await page.locator('body').innerText(), /[\u3400-\u9fff]/);
       const cases = [
-        ['match', '(3, 2)', 'true', '=', '=', '两项版本都匹配'],
-        ['document', '(4, 2)', 'false', '≠', '=', '文档版本从 3 变为 4'],
-        ['model', '(3, 3)', 'false', '=', '≠', '模型版本从 2 变为 3'],
-        ['match', '(3, 2)', 'true', '=', '=', '两项版本都匹配'],
+        ['match', '(3, 2)', 'true', '=', '=', 'Both versions match'],
+        ['document', '(4, 2)', 'false', '≠', '=', 'The document version changed from 3 to 4'],
+        ['model', '(3, 3)', 'false', '=', '≠', 'The model version changed from 2 to 3'],
+        ['match', '(3, 2)', 'true', '=', '=', 'Both versions match'],
       ];
       for (const [preset, key, reuse, doc, model, reason] of cases) {
         await page.locator(`[data-preset="${preset}"]`).click();
@@ -56,6 +58,12 @@ for (const width of [1280, 390]) {
         assert.equal(await page.locator('#model-comparison').textContent(), model);
         assert.ok((await page.locator('#reason').textContent()).includes(reason));
         assert.equal(await page.locator('[aria-pressed="true"]').count(), 1);
+        const labelFits = await page.locator('#cache-result').evaluate(label => {
+          const text = label.getBBox();
+          const screen = document.getElementById('cache-screen').getBBox();
+          return text.x >= screen.x && text.x + text.width <= screen.x + screen.width;
+        });
+        assert.ok(labelFits, 'The English result label must fit inside the cache display');
       }
       await page.locator('[data-preset="document"]').focus();
       await page.keyboard.press('Enter');
@@ -83,7 +91,7 @@ for (const width of [1280, 390]) {
 test('cache has readable no-JavaScript content', async () => {
   const { context, page, external } = await openPage('/cache-key/', { javaScriptEnabled: false });
   try {
-    assert.match(await page.locator('#result-title').textContent(), /可以复用/);
+    assert.match(await page.locator('#result-title').textContent(), /Reuse the stored result/);
     assert.equal(await page.locator('#document-value').textContent(), '3');
     assert.ok(await page.locator('noscript').isVisible());
     assert.ok(await page.locator('[data-preset="document"]').isDisabled());

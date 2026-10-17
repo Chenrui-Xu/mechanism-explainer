@@ -9,9 +9,9 @@ of measured learning gains.
 
 ## 1. A definition should stay small
 
-**Request:** 用两句话解释“缓存命中”。我是刚开始写代码的人。
+**Request:** Explain “cache hit” in two sentences. I am new to programming.
 
-**Pass:** Defines reuse of a stored result in accessible Chinese. Stays within
+**Pass:** Defines reuse of a stored result in accessible English. Stays within
 two sentences. Does not create an HTML app, mechanical analogy, or mandatory quiz.
 
 ## 2. Preserve the source's uncertainty
@@ -39,7 +39,7 @@ submission appear published before approval. Explains the main relation briefly.
 
 ## 4. Pair text with the current state
 
-**Request:** Create a single-file Chinese explainer for this toy cache:
+**Request:** Create a single-file English explainer for this toy cache:
 the existing stored key is (document version 3, model version 2). A request
 reuses it only when both values match; otherwise it recomputes. Show matching,
 changed-document, and changed-model examples. Ignore expiry and eviction.
@@ -60,12 +60,12 @@ affects the result was left out of the key.
 Explains that matching the incomplete key alone cannot establish freshness.
 Does not let an attractive “unlocked” picture imply correctness.
 
-## 6. Keep conditions in Chinese
+## 6. Keep conditions and model boundaries
 
 **Source:** “If demand remains below capacity, this simplified model predicts
 that the queue will clear. It does not include equipment failures.”
 
-**Request:** 用自然中文解释给非工程师，不要新增结论。
+**Request:** Explain this to a non-engineer in plain English. Do not add claims.
 
 **Pass:** Preserves the condition, identifies a model prediction, and retains
 the exclusion of equipment failures. Does not promise a queue will always clear.

@@ -2,7 +2,7 @@
 
 This original example uses the bundled Anatomy SVG core and this project's
 paired-explainer module. The HTML has no network dependencies. Its language
-is Chinese; its calculation uses SI units.
+is English; its calculation uses SI units.
 
 From the repository root:
 

@@ -69,19 +69,19 @@ const initialArrow = k.segment(initialArrowStart,initialArrowEnd,P)
 const initialMeasure = k.segment([-6,43,1],[-6+initial.extensionMm,43,1],P);
 const initialCaps = k.segment([-6,40,1],[-6,46,1],P)
   +k.segment([-6+initial.extensionMm,40,1],[-6+initial.extensionMm,46,1],P);
-const svg = k.figureSvg({width:W,height:H,label:'理想弹簧：左端固定，右端连接沿轨道移动的滑块。拉力使滑块右移，伸长量从无拉力位置开始测量。',body:[
+const svg = k.figureSvg({width:W,height:H,label:'An ideal spring with a fixed left end and a carriage on a rail. Force pulls the carriage right. Extension is measured from its zero-force position.',body:[
   staticMachine(),
-  `<g data-ref="spring" tabindex="0" role="group" aria-label="弹簧，对应右侧的刚度说明"><path id="coil-back" class="iso-line spring-line" data-tone="hi" d="${initialCoil.back}"/><path id="coil-front" class="iso-line spring-line" data-tone="hi" d="${initialCoil.front}"/></g>`,
-  `<g data-ref="carriage" data-part="carriage" tabindex="0" role="group" aria-label="滑块和拉力，对应右侧的拉力说明" transform="${initialCarriage}">${carriage()}</g>`,
+  `<g data-ref="spring" tabindex="0" role="group" aria-label="Spring, paired with the stiffness explanation"><path id="coil-back" class="iso-line spring-line" data-tone="hi" d="${initialCoil.back}"/><path id="coil-front" class="iso-line spring-line" data-tone="hi" d="${initialCoil.front}"/></g>`,
+  `<g data-ref="carriage" data-part="carriage" tabindex="0" role="group" aria-label="Carriage and applied force, paired with the force explanation" transform="${initialCarriage}">${carriage()}</g>`,
   `<g data-ref="carriage" aria-hidden="true"><path id="force-arrow" class="force-arrow" d="${initialArrow}"/></g>`,
-  `<g data-ref="extension" tabindex="0" role="group" aria-label="伸长量，从无拉力位置测量"><path id="extension-line" class="measure-line" d="${initialMeasure}"/><path id="extension-caps" class="measure-line" d="${initialCaps}"/></g>`,
+  `<g data-ref="extension" tabindex="0" role="group" aria-label="Extension, measured from the zero-force position"><path id="extension-line" class="measure-line" d="${initialMeasure}"/><path id="extension-caps" class="measure-line" d="${initialCaps}"/></g>`,
 ]}).replace('role="img"','role="group"');
 
 const presets = springPresets.map(p=>`<button type="button" data-preset="${p.id}" aria-pressed="${p.id==='baseline'}" disabled>${p.label}</button>`).join('');
-const controls = `<section class="controls" aria-label="改变弹簧参数">
-  <div class="control-row"><label for="force">拉力 F <output id="force-value" for="force">6.0 N</output></label><input id="force" type="range" min="${springLimits.forceMin}" max="${springLimits.forceMax}" step="${springLimits.forceStep}" value="6" aria-describedby="force-help" disabled><p id="force-help">向右拉的力，范围 0–12 N。</p></div>
-  <div class="control-row"><label for="stiffness">刚度 k <output id="stiffness-value" for="stiffness">300 N/m</output></label><input id="stiffness" type="range" min="${springLimits.stiffnessMin}" max="${springLimits.stiffnessMax}" step="${springLimits.stiffnessStep}" value="300" aria-describedby="stiffness-help" disabled><p id="stiffness-help">刚度越大，弹簧越难拉长，范围 100–600 N/m。</p></div>
-  <div class="presets" aria-label="比较四种情况">${presets}</div>
+const controls = `<section class="controls" aria-label="Change the spring parameters">
+  <div class="control-row"><label for="force">Force F <output id="force-value" for="force">6.0 N</output></label><input id="force" type="range" min="${springLimits.forceMin}" max="${springLimits.forceMax}" step="${springLimits.forceStep}" value="6" aria-describedby="force-help" disabled><p id="force-help">A force to the right, from 0 to 12 N.</p></div>
+  <div class="control-row"><label for="stiffness">Stiffness k <output id="stiffness-value" for="stiffness">300 N/m</output></label><input id="stiffness" type="range" min="${springLimits.stiffnessMin}" max="${springLimits.stiffnessMax}" step="${springLimits.stiffnessStep}" value="300" aria-describedby="stiffness-help" disabled><p id="stiffness-help">Higher stiffness makes the spring harder to stretch. Range: 100–600 N/m.</p></div>
+  <div class="presets" aria-label="Compare four cases">${presets}</div>
 </section>`;
 
 const css = `
@@ -112,13 +112,13 @@ function updateSpring() {
   document.querySelector('#stiffness-value').textContent = state.stiffnessNm+' N/m';
   document.querySelector('#extension-value').textContent = x.toFixed(1)+' mm';
   document.querySelector('#equation').textContent = 'x = '+state.forceN.toFixed(1)+' / '+state.stiffnessNm+' ≈ '+state.extensionM.toFixed(4)+' m';
-  document.querySelector('#force-meaning').textContent = '滑块受到向右 '+state.forceN.toFixed(1)+' N 的拉力。绿色箭头表示它的方向和大小。';
-  document.querySelector('#stiffness-meaning').textContent = 'k = '+state.stiffnessNm+' N/m。在这个理想模型中，每多伸长 1 mm，需要多 '+(state.stiffnessNm/1000).toFixed(3)+' N 的拉力。';
-  document.querySelector('#extension-meaning').textContent = 'x = '+x.toFixed(1)+' mm。棕色线段从无拉力时的零位量起，不是弹簧的总长度。';
-  document.querySelector('#narrative').textContent = state.forceN === 0 ? '没有拉力时，伸长为 0 mm。弹簧仍有自身的长度。' : '当前静止在平衡位置：弹簧向左的回复力与向右的拉力大小相等。';
-  forceInput.setAttribute('aria-valuetext',state.forceN.toFixed(1)+' 牛顿');
-  stiffnessInput.setAttribute('aria-valuetext',state.stiffnessNm+' 牛顿每米');
-  svgRoot.setAttribute('aria-label','左端固定的弹簧。拉力 '+state.forceN.toFixed(1)+' 牛顿，刚度 '+state.stiffnessNm+' 牛顿每米，伸长 '+x.toFixed(1)+' 毫米。');
+  document.querySelector('#force-meaning').textContent = 'A '+state.forceN.toFixed(1)+' N force pulls the carriage right. The green arrow shows its direction and size.';
+  document.querySelector('#stiffness-meaning').textContent = 'k = '+state.stiffnessNm+' N/m. Each extra millimetre of extension needs '+(state.stiffnessNm/1000).toFixed(3)+' N more force in this model.';
+  document.querySelector('#extension-meaning').textContent = 'x = '+x.toFixed(1)+' mm. The brown line measures from the zero-force position, not the spring’s total length.';
+  document.querySelector('#narrative').textContent = state.forceN === 0 ? 'With no applied force, extension is 0 mm. The spring still has its original length.' : 'At rest, the spring pulls left with the same force that pulls the carriage right.';
+  forceInput.setAttribute('aria-valuetext',state.forceN.toFixed(1)+' newtons');
+  stiffnessInput.setAttribute('aria-valuetext',state.stiffnessNm+' newtons per metre');
+  svgRoot.setAttribute('aria-label','Spring with a fixed left end. Force '+state.forceN.toFixed(1)+' newtons, stiffness '+state.stiffnessNm+' newtons per metre, extension '+x.toFixed(1)+' millimetres.');
   for (const b of document.querySelectorAll('[data-preset]')) {
     const p = springPresets.find(p=>p.id===b.dataset.preset);
     b.setAttribute('aria-pressed',String(p.forceN===state.forceN&&p.stiffnessNm===state.stiffnessNm));
@@ -148,14 +148,14 @@ ${read('../../vendor/visual-explainer/LICENSE')}
 Original example and paired-explainer module:
 ${read('../../LICENSE')}
 -->
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>拉力与伸长 · Explain with Models</title><style>${read('../../assets/paired-explainer/paired-explainer.css')}\n${css}</style></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Force and extension · Explain with Models</title><style>${read('../../assets/paired-explainer/paired-explainer.css')}\n${css}</style></head>
 <body class="iso" data-theme="light"><main>
-<header><div class="eyebrow">EXPLAIN WITH MODELS / 02 · 理想弹簧</div><h1>同样的弹簧，拉力越大，伸长越多。</h1><p class="lead">保持刚度不变，把拉力加倍，伸长也会加倍。改变下面的参数，看同一条公式如何改变装置和解释。</p></header>
-<noscript><p class="noscript">当前显示 6 N、300 N/m 的静态示例，伸长为 20 mm。交互需要 JavaScript。</p></noscript>
-<div class="layout"><figure class="machine"><div class="figure-top"><strong>01 / 左端固定，右端可移动</strong><span>静态平衡</span></div><div class="iso-stage">${svg}</div><figcaption class="caption">滑块沿轨道右移。棕色线段显示伸长，绿色箭头显示拉力。悬停或用 Tab 聚焦图和文字，可找到对应部分。</figcaption></figure>
-<aside class="explanation" aria-labelledby="explanation-title"><h2 id="explanation-title">公式如何解释当前状态</h2><p class="result-label">伸长量 x</p><output id="extension-value" class="result" for="force stiffness" aria-live="polite" aria-atomic="true">20.0 mm</output><div class="equation"><div>F = kx → x = F / k</div><div id="equation">x = 6.0 / 300 ≈ 0.0200 m</div></div><dl class="meaning"><dt><span data-ref="carriage" tabindex="0">1. 拉力 F：我们施加的力</span></dt><dd id="force-meaning">滑块受到向右 6.0 N 的拉力。绿色箭头表示它的方向和大小。</dd><dt><span data-ref="spring" tabindex="0">2. 刚度 k：弹簧有多难拉长</span></dt><dd id="stiffness-meaning">k = 300 N/m。在这个理想模型中，每多伸长 1 mm，需要多 0.300 N 的拉力。</dd><dt><span data-ref="extension" tabindex="0">3. 伸长 x：比原来多出的长度</span></dt><dd id="extension-meaning">x = 20.0 mm。棕色线段从无拉力时的零位量起，不是弹簧的总长度。</dd></dl><p id="narrative">当前静止在平衡位置：弹簧向左的回复力与向右的拉力大小相等。</p></aside>${controls}</div>
-<section class="boundary" aria-label="模型边界和阅读方式"><p><strong>这是一个简化模型。</strong>它采用胡克定律 F = kx，假设弹簧理想且线性、轨道无摩擦。它只显示静止后的平衡位置，不模拟振动、屈服或断裂。改变 k 等于更换理想弹簧；外形不表示真实材料尺寸。</p><p><strong>自己核对两次。</strong>点击「拉力加倍」，伸长应从 20 mm 变为 40 mm。点击「刚度加倍」，伸长应为 10 mm。用 Tab 选择滑块，再按方向键，数值、图和文字应同步改变。</p></section>
-<footer>模型：牛顿（N）表示力，米（m）表示长度，1 m = 1000 mm。F 表示拉力的大小。<br>绘图使用 Anatomy SVG core；文字与图的对应由本项目的 paired-explainer 模块提供。无需网络或外部字体。</footer>
+<header><div class="eyebrow">EXPLAIN WITH MODELS / 02 · IDEAL SPRING</div><h1>For the same spring, more force means more stretch.</h1><p class="lead">Double the force at the same stiffness, and the extension doubles. Change a value to see the drawing and explanation update together.</p></header>
+<noscript><p class="noscript">This static example shows 6 N and 300 N/m, giving 20 mm of extension. Interactive controls need JavaScript.</p></noscript>
+<div class="layout"><figure class="machine"><div class="figure-top"><strong>Fixed anchor · moving carriage</strong><span>At rest</span></div><div class="iso-stage">${svg}</div><figcaption class="caption">The carriage moves right along the rail. Brown marks extension; green shows force. Hover or press Tab to highlight matching parts and text.</figcaption></figure>
+<aside class="explanation" aria-labelledby="explanation-title"><h2 id="explanation-title">Read the current state</h2><p class="result-label">Extension x</p><output id="extension-value" class="result" for="force stiffness" aria-live="polite" aria-atomic="true">20.0 mm</output><div class="equation"><div>F = kx → x = F / k</div><div id="equation">x = 6.0 / 300 ≈ 0.0200 m</div></div><dl class="meaning"><dt><span data-ref="carriage" tabindex="0">1. Force F: the pull we apply</span></dt><dd id="force-meaning">A 6.0 N force pulls the carriage right. The green arrow shows its direction and size.</dd><dt><span data-ref="spring" tabindex="0">2. Stiffness k: resistance to stretching</span></dt><dd id="stiffness-meaning">k = 300 N/m. Each extra millimetre of extension needs 0.300 N more force in this model.</dd><dt><span data-ref="extension" tabindex="0">3. Extension x: the added length</span></dt><dd id="extension-meaning">x = 20.0 mm. The brown line measures from the zero-force position, not the spring’s total length.</dd></dl><p id="narrative">At rest, the spring pulls left with the same force that pulls the carriage right.</p></aside>${controls}</div>
+<section class="boundary" aria-label="Model limits and checks"><p><strong>This is a simplified model.</strong> It uses Hooke’s law, F = kx, for an ideal linear spring on a frictionless rail. It shows the final position at rest. It does not model vibration, yielding, or fracture. Changing k represents a different ideal spring; the drawing does not specify its material or dimensions.</p><p><strong>Try two checks.</strong> Select “Double force”: extension should change from 20 mm to 40 mm. Select “Double stiffness”: it should be 10 mm. Use Tab to select a slider, then press an arrow key. The values, drawing, and text should change together.</p></section>
+<footer>Units: newtons (N) measure force; metres (m) measure length. 1 m = 1000 mm. F is the magnitude of the applied force.<br>Drawing: Anatomy SVG core. Linked text and graphics: this project’s paired-explainer module. No network connection or external fonts are needed.</footer>
 </main><script type="module">${script.replace(/<\/(script)/gi,'<\\/$1')}</script></body></html>\n`;
 writeFileSync(new URL('index.html',HERE),page);
 console.log(`Built ${fileURLToPath(new URL('index.html',HERE))} (${Buffer.byteLength(page)} bytes)`);

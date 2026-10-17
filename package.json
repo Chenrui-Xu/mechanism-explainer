@@ -1,6 +1,6 @@
 {
   "name": "explain-with-models",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Clear technical prose, synchronized visual explanations, and Anatomy SVG tools in one agent skill.",
   "type": "module",

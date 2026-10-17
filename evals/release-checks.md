@@ -1,9 +1,35 @@
-# v0.1.0 release checks
+# Release checks
 
-Checked on 2026-10-16. This records implementation checks and an agent trial,
+This records implementation checks and an agent trial,
 not a human learning study or a guarantee about future generated explanations.
 
-## Repeatable implementation checks
+## v0.1.1: English-content revision
+
+This revision changes maintained documentation, example interfaces, source text,
+and preview images to English. The skill continues to follow the reader's
+requested language when it generates an explanation. The three upstream
+revisions remain unchanged.
+
+The repository validator now checks distributed text for Han characters and
+checks HTML language declarations. The README documents this release convention.
+That language check is a release-content check, not a measure of writing quality
+or proof that every string is English.
+
+Re-run on 2026-10-16 after the English conversion:
+
+- All three standalone examples rebuilt successfully.
+- Skill format, local links, English-content checks, and upstream hashes passed.
+- All 19 unit tests and 13 Chromium browser tests passed.
+- Desktop and 390 px screenshots of the translated examples were inspected.
+  English labels, controls, and state explanations fit without horizontal overflow.
+- The README preview image was replaced with the English spring example.
+
+The results below retain the separate v0.1.0 history. The independent agent
+trial was not repeated for this translation-only revision.
+
+## v0.1.0: historical implementation checks
+
+Checked on 2026-10-16, before the English-content revision.
 
 | Check | Result and scope |
 |---|---|
@@ -26,12 +52,13 @@ order, misleading enabled controls without JavaScript, screenshot output paths
 containing spaces, and malformed requests to the local preview server.
 
 Run the commands in [README](../README.md#build-and-check). GitHub Actions repeats
-the implementation checks on Linux and uploads browser screenshots. The
-[preview image](../docs/spring-balance.png) is from the local browser test.
+the implementation checks on Linux and uploads browser screenshots. The release
+preview is generated from a local browser screenshot; the image in the current
+repository is updated for the English-content revision.
 
-## Independent skill trial
+## v0.1.0: historical independent skill trial
 
-A separate agent received an isolated copy of the skill and three requests. It
+A separate agent received an isolated copy of the v0.1.0 skill and three requests. It
 read the skill and its routed resources, without the existing evaluation cases
 or test files. The trial checked these behaviors:
 
@@ -53,6 +80,8 @@ distinguishes the editable template/build script from the generated preview.
 This is a functional agent trial. It does not show how well people learn from
 the outputs. The new water-tank output is separate from the three maintained
 release examples; its checks do not expand the browser-suite claims above.
+The Chinese-language trial outputs are historical evidence. They are not bundled
+as v0.1.1 examples and were not relabeled as English outputs.
 
 ## Limits of this check
 

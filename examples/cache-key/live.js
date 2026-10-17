@@ -12,13 +12,13 @@
     const current = presets[name];
     const decision = evaluateCache(current, storedCache);
     const key = '(' + current.documentVersion + ', ' + current.modelVersion + ')';
-    const title = decision.reuse ? '可以复用旧结果' : '需要重新计算';
+    const title = decision.reuse ? 'Reuse the stored result' : 'Recompute the result';
     element('current-key').textContent = key;
     element('result-title').textContent = title;
     element('reason').textContent = decision.reason;
     element('explanation').dataset.reuse = String(decision.reuse);
     element('cache').dataset.reuse = String(decision.reuse);
-    element('cache-result').textContent = decision.reuse ? '复用' : '不复用';
+    element('cache-result').textContent = decision.reuse ? 'Reuse' : 'Recompute';
     for (const [field, value, cached, matches] of [
       ['document', current.documentVersion, storedCache.documentVersion, decision.documentMatches],
       ['model', current.modelVersion, storedCache.modelVersion, decision.modelMatches]
@@ -28,12 +28,12 @@
       element(field + '-slot').dataset.match = String(matches);
       element(field + '-check').dataset.match = String(matches);
       element(field + '-wire').setAttribute('class', 'wire ' + (matches ? 'active' : 'inactive'));
-      element(field + '-detail').textContent = '当前 ' + value + (matches ? ' = ' : ' ≠ ') + '缓存 ' + cached + (matches ? ' · 匹配' : ' · 不匹配');
+      element(field + '-detail').textContent = 'Current ' + value + (matches ? ' = ' : ' ≠ ') + 'stored ' + cached + (matches ? ' · Match' : ' · Mismatch');
     }
-    element('diagram-description').textContent = '当前键为 ' + key + '，已有缓存键为 (3, 2)。' + title + '。' + decision.reason;
+    element('diagram-description').textContent = 'The current key is ' + key + '. The stored cache key is (3, 2). ' + title + '. ' + decision.reason;
     for (const button of presetButtons) button.setAttribute('aria-pressed', String(button.dataset.preset === name));
     // Only user actions write to this live region. There is no per-frame announcement.
-    if (announce) element('announcement').textContent = '当前键 ' + key + '。' + title + '。' + decision.reason;
+    if (announce) element('announcement').textContent = 'Current key ' + key + '. ' + title + '. ' + decision.reason;
   }
   for (const button of presetButtons) {
     button.disabled = false;

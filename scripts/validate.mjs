@@ -1,6 +1,6 @@
 import { readFile, readdir, access } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { dirname, resolve, relative, sep } from 'node:path';
+import { dirname, resolve, relative, sep, extname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -25,8 +25,16 @@ if (!front || !/^name: explain-with-models$/m.test(front[1]) || !/^description: 
 }
 
 const files = await walk(root);
+const textExtensions = new Set(['.md', '.mjs', '.js', '.ts', '.py', '.json', '.yaml', '.yml', '.html', '.css', '.txt']);
 for (const file of files) {
   const rel = relative(root, file).split(sep).join('/');
+  if (textExtensions.has(extname(file)) || ['LICENSE', '.gitignore'].includes(basename(file))) {
+    const content = await readFile(file, 'utf8');
+    if (/\p{Script=Han}/u.test(content)) problems.push(`Non-English release text (Han characters): ${rel}`);
+    if (file.endsWith('.html') && !/<html\b[^>]*\blang=["']en(?:-[A-Za-z]+)?["']/i.test(content)) {
+      problems.push(`Published HTML must declare English: ${rel}`);
+    }
+  }
   if (file.endsWith('.md') && !rel.startsWith('vendor/')) {
     const content = await readFile(file, 'utf8');
     if (/\/Users\/|C:\\Users\\/.test(content)) problems.push(`Machine-specific path: ${rel}`);
@@ -57,4 +65,4 @@ for (const path of ['LICENSE', 'ATTRIBUTION.md', 'references/clear-writing.md', 
   try { await access(resolve(root, path)); } catch { problems.push(`Missing integrated resource: ${path}`); }
 }
 if (problems.length) { console.error(problems.join('\n')); process.exitCode = 1; }
-else console.log(`Validation passed: skill identity, local links, ${files.length} distributable files, and recorded unmodified upstream hashes.`);
+else console.log(`Validation passed: skill identity, local links, English release text, ${files.length} distributable files, and recorded unmodified upstream hashes.`);

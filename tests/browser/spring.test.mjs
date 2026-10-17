@@ -30,6 +30,7 @@ async function openSpring(options = {}) {
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto(`${base}/spring-balance/`);
+  assert.equal(await page.locator('html').getAttribute('lang'), 'en');
   return { context, page, errors, external };
 }
 
@@ -58,7 +59,7 @@ async function assertState(page, force, stiffness, extension) {
   assert.ok((await page.locator('#force-meaning').textContent()).includes(`${force.toFixed(1)} N`));
   assert.ok((await page.locator('#stiffness-meaning').textContent()).includes(`${stiffness} N/m`));
   assert.ok((await page.locator('#extension-meaning').textContent()).includes(`${extension.toFixed(1)} mm`));
-  assert.ok((await page.locator('.iso-svg').getAttribute('aria-label')).includes(`${extension.toFixed(1)} 毫米`));
+  assert.ok((await page.locator('.iso-svg').getAttribute('aria-label')).includes(`${extension.toFixed(1)} millimetres`));
   assert.ok(await page.locator('#force').isEnabled());
   assert.ok(await page.locator('#stiffness').isEnabled());
 }
@@ -187,7 +188,7 @@ for (const width of [1280, 390]) {
       assert.ok(await page.locator('noscript').isVisible());
       assert.equal(await page.locator('#extension-value').textContent(), '20.0 mm');
       assert.match(await page.locator('#equation').textContent(), /0\.0200 m/);
-      assert.match(await page.locator('#narrative').textContent(), /平衡位置/);
+      assert.match(await page.locator('#narrative').textContent(), /At rest/);
       assert.ok((await page.locator('#force-arrow').getAttribute('d')).length > 0);
       for (const control of await page.locator('.controls input, .controls button').all()) {
         assert.ok(await control.isDisabled(), 'An inert control must not appear usable without JavaScript');

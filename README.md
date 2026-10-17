@@ -4,7 +4,7 @@ An agent skill that explains a technical idea with clear prose, a coordinated
 visual, and an interactive model when one helps. Text, numbers, and highlights
 come from the same state, so the reader can see what changed and why it matters.
 
-**v0.1.0 · MIT · English and Chinese guidance**
+**v0.1.1 · MIT · English documentation and examples**
 
 ![A spring balance with controls, a displacement readout, and an adjacent explanation](docs/spring-balance.png)
 
@@ -26,14 +26,10 @@ Anatomy's WebGL, true 3D engine, React wrappers, and community publishing are
 outside this bundle. No separate Anatomy installation is needed for the
 included SVG examples.
 
-## 中文说明
-
-这个 skill 把三个部分放进同一套工作流程：先用清楚的文字回答问题，再让文字
-和图中的重点对应起来；需要解释实体结构或运动时，使用内置的 Anatomy SVG
-绘图工具。交互变化时，图、数值和旁边的解释一起更新。
-
-简化表达时，保留条件、范围、数字、否定和不确定性。中文不套用英语词数规则。
-图里可以有必要的标签，也没有最低零件数量要求。类比必须说明对应关系和局限。
+The v0.1.1 release presents the maintained documentation, example interfaces,
+and preview images in English. The skill still writes in the reader's requested
+language. Adapt clarity rules to that language; English word counts and the
+bundled English checker do not apply to every language.
 
 ## Install as a skill
 
@@ -61,9 +57,10 @@ Show what changes when one key field differs, and explain the analogy's limits.
 ```
 
 ```text
-用 $explain-with-models 解释弹簧刚度与位移的关系。先给一句结论。
-做一个能调整力和刚度的示例，让图、数值和解释对应同一个状态。
-说明线性弹簧模型的适用范围，不要把示例当作真实设备测量。
+Use $explain-with-models to explain how spring stiffness affects extension.
+Start with one sentence that answers the question. Let me change force and stiffness.
+Keep the drawing, values, and explanation tied to the same state.
+State the linear model's limits and identify its values as educational examples.
 ```
 
 Use the invocation syntax your agent supports. You can also ask it to read
@@ -71,7 +68,7 @@ Use the invocation syntax your agent supports. You can also ask it to read
 
 ## Examples and reusable pieces
 
-- [Cache key](examples/cache-key/index.html): a Chinese explanation with matching,
+- [Cache key](examples/cache-key/index.html): an English explanation with matching,
   changed-document, and changed-model states. [Source and model](examples/cache-key/).
 - [Spring balance](examples/spring-balance/index.html): an Anatomy SVG figure with
   force, stiffness, displacement, and an adjacent explanation. [Build source](examples/spring-balance/build.mjs).
@@ -111,7 +108,8 @@ The tests cover model calculations, state transitions, source integrity, and
 selected browser behavior. Browser checks inspect desktop and narrow layouts,
 controls, fallback content, and output agreement. Read the
 [behavioral evaluation cases](evals/cases.md) when changing the skill's workflow.
-The [v0.1.0 check record](evals/release-checks.md) states the tested scope.
+The [release check record](evals/release-checks.md) separates the current revision
+from historical v0.1.0 evidence and states the tested scope.
 An automated pass does not establish factual accuracy, complete accessibility,
 or improved learning; review the source claims and the rendered explanation.
 
@@ -133,6 +131,11 @@ Include the explanation that fails, the intended reader, and the improved
 output. For code changes, run the build, tests, and validation above. For writing
 or workflow changes, use a relevant behavioral case and compare meaning before
 and after. Keep a limitation visible when hiding it would change the main claim.
+
+Keep repository documentation, source text, bundled example interfaces, and
+preview screenshots in English. The validator checks distributed text and HTML
+language declarations. This release convention does not restrict the language
+of explanations that the skill generates for a user.
 
 Original work is copyright (c) 2026 Chenrui Xu under the [MIT License](LICENSE).
 The three upstream projects retain their MIT notices and pinned provenance;
