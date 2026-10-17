@@ -58,12 +58,13 @@ for (const width of [1280, 390]) {
         assert.equal(await page.locator('#model-comparison').textContent(), model);
         assert.ok((await page.locator('#reason').textContent()).includes(reason));
         assert.equal(await page.locator('[aria-pressed="true"]').count(), 1);
-        const labelFits = await page.locator('#cache-result').evaluate(label => {
+        const labelBounds = await page.locator('#cache-result').evaluate(label => {
           const text = label.getBBox();
           const screen = document.getElementById('cache-screen').getBBox();
-          return text.x >= screen.x && text.x + text.width <= screen.x + screen.width;
+          return { x: text.x, width: text.width, left: screen.x, right: screen.x + screen.width };
         });
-        assert.ok(labelFits, 'The English result label must fit inside the cache display');
+        assert.ok(labelBounds.x >= labelBounds.left && labelBounds.x + labelBounds.width <= labelBounds.right,
+          `The English result label must fit inside the cache display: ${JSON.stringify(labelBounds)}`);
       }
       await page.locator('[data-preset="document"]').focus();
       await page.keyboard.press('Enter');
