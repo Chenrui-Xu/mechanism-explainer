@@ -1,10 +1,10 @@
 ---
-name: explain-with-models
+name: mechanism-explainer
 description: Explain technical ideas with clear prose and coordinated diagrams or interactive models. Use for teaching mechanisms, tracing processes, or making an existing visual explanation easier to understand. Choose prose alone when a visual adds no value.
 license: MIT
 ---
 
-# Explain with Models
+# Mechanism Explainer
 
 Help the reader explain why something happens and predict what happens next.
 Choose the representation around that learning goal. Visual polish supports it.
@@ -15,7 +15,9 @@ Resolve resource paths relative to this skill's directory, not the user's projec
 
 ## Start with the explanation
 
-Infer the reader's background, language, and intended use from the request.
+Infer the reader's background and intended use from the request. Use English
+for explanations and artifacts unless the user explicitly requests another
+output language. Do not infer publication language from conversation language.
 Ask only when missing information would change the answer substantially.
 For a short answer, keep this planning internal.
 
@@ -76,15 +78,15 @@ produce standalone HTML files.
 ## Write the text with the visual
 
 Read [clear writing](references/clear-writing.md) for meaning-preserving edits,
-Chinese guidance, and the optional English style checker.
+language-specific guidance, and the optional English style checker.
 
 Lead with the answer. Use concrete verbs, stable terms, and sentences with a
 clear subject. Introduce necessary technical terms when they first matter.
 Keep the causal link, even when that requires a longer sentence.
 
-Use the reader's language. In Chinese, use natural clauses and explicit
-conditions; do not apply an English word-count threshold. In English, short
-sentences are useful guidance, not a compliance score. This skill does not
+Honor an explicitly requested output language. Adapt sentence structure to that
+language; do not apply an English word-count threshold to other languages.
+In English, short sentences are useful guidance, not a compliance score. This skill does not
 certify ASD-STE100 compliance or use a percentage as a quality metric.
 
 Write the explanation while defining the scene, not after finishing the art:

@@ -3,6 +3,40 @@
 This records implementation checks and an agent trial,
 not a human learning study or a guarantee about future generated explanations.
 
+## v0.2.0: Mechanism Explainer
+
+Checked on 2026-10-16. The project is now named Mechanism Explainer, with the
+skill identifier `mechanism-explainer`. Public documentation, examples, images,
+and release notes use English. Generated explanations also default to English;
+an explicit request for another output language overrides that default.
+
+- All three examples rebuilt with the new name.
+- All 19 unit tests and 13 Chromium browser tests passed.
+- Desktop and phone screenshots of the renamed spring example were inspected;
+  the README preview was refreshed from the desktop capture.
+- The gallery was checked in Chromium at 1280, 390, and 320 px: its image loaded,
+  all three relative example routes returned 200, and there was no horizontal
+  overflow or page error. Desktop and phone screenshots were inspected.
+- Skill format, 63 distributable files, local links, English-content checks,
+  and all recorded unmodified upstream file hashes passed validation.
+- A fresh agent, without inherited context or expected outputs, read isolated
+  copies of the skill and its clear-writing resource. It handled three requests:
+  a prompt in another language produced two English sentences; an explicit
+  language request was honored; and an English rewrite retained an unknown
+  actor, a condition, uncertainty, and the limit on causal interpretation.
+
+This was one agent given three requests together. Its harness required prose
+responses and prohibited creating applications, so it did not independently
+test format selection. It was not a human study or reliability measurement.
+The source hashes tested were:
+
+- `SKILL.md`: `f6f26971e271560419837114b87bf9c8907307042fb36fd97adc0aee6a5b7da0`
+- `references/clear-writing.md`: `b2f3b4ef0713df3d489ce663a6d6a27d3eaf8d6a67398c87a9d51be1f7cd348d`
+
+The earlier v0.1.0 public release and its screenshot artifacts were withdrawn.
+Development history remains intact; the historical trial below is retained as
+historical evidence, not relabeled as English work.
+
 ## v0.1.1: English-content revision
 
 This revision changes maintained documentation, example interfaces, source text,

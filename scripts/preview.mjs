@@ -2,8 +2,10 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
-// Only release examples are exposed. No directory browsing or arbitrary paths.
+// Only the public gallery and examples are exposed. No arbitrary paths.
 const routes = new Map([
+  ['/', new URL('../docs/index.html', import.meta.url)],
+  ['/spring-balance.png', new URL('../docs/spring-balance.png', import.meta.url)],
   ['/cache-key/', new URL('../examples/cache-key/index.html', import.meta.url)],
   ['/spring-balance/', new URL('../examples/spring-balance/index.html', import.meta.url)],
   ['/paired-template/', new URL('../assets/paired-explainer/index.html', import.meta.url)],
@@ -19,16 +21,11 @@ export async function startPreview({ port = 0 } = {}) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       response.writeHead(405).end(); return;
     }
-    if (url.pathname === '/') {
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
-      response.end('<!doctype html><html lang="en"><meta charset="utf-8"><title>Explain with Models examples</title><h1>Explain with Models</h1><ul><li><a href="/cache-key/">Cache key — paired explanation</a></li><li><a href="/spring-balance/">Spring balance — Anatomy SVG</a></li><li><a href="/paired-template/">Reusable paired template</a></li></ul></html>');
-      return;
-    }
     const file = routes.get(url.pathname);
     if (!file) { response.writeHead(404).end('Not found'); return; }
     try {
       const body = await readFile(file);
-      response.setHeader('Content-Type', 'text/html; charset=utf-8');
+      response.setHeader('Content-Type', file.pathname.endsWith('.png') ? 'image/png' : 'text/html; charset=utf-8');
       response.end(request.method === 'HEAD' ? undefined : body);
     } catch {
       response.writeHead(404).end('Build this example first');

@@ -1,3 +1,4 @@
 interface:
-  display_name: "Explain with Models"
+  display_name: "Mechanism Explainer"
   short_description: "Clear prose and visuals that explain the same model"
+  default_prompt: "Use $mechanism-explainer to explain how this works with clear writing and a visual when useful."

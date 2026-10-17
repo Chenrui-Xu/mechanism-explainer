@@ -1,6 +1,6 @@
 # Public sources and integration choices
 
-The v0.1.1 integration retains the three public sources pinned for v0.1.0. This is a
+The v0.2.0 integration retains the three public sources pinned for v0.1.0. This is a
 record of source reuse and design choices, not a benchmark of learning outcomes.
 Exact file paths, license notices, and hashes are recorded in the linked manifests.
 

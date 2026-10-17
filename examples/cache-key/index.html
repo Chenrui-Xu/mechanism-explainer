@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <meta name="description" content="An interactive cache-key example: compare document and model versions to decide whether a stored result can be reused.">
-  <title>Reuse requires both versions to match · Explain with Models</title>
+  <title>Reuse requires both versions to match · Mechanism Explainer</title>
   <style>
     :root { color-scheme: light; --paper: #f6f5f0; --surface: #fffefa; --ink: #25332f; --muted: #60716a; --line: #d4dcd4; --green: #176650; --green-soft: #e3f0e8; --orange: #975128; --orange-soft: #fbecde; }
     * { box-sizing: border-box; }
@@ -102,7 +102,7 @@
 <body>
 <main>
   <header>
-    <p class="eyebrow">EXPLAIN WITH MODELS / 01</p>
+    <p class="eyebrow">MECHANISM EXPLAINER / 01</p>
     <h1>Reuse requires both versions to match</h1>
     <p class="thesis">Reuse the stored result only if it exists and both the document version and the model version match.</p>
     <p class="definition">A cache holds a previously calculated result. Its key identifies that result. Here, <code>key = (document version, model version)</code>. The example assumes the cache entry exists and ignores expiry and eviction.</p>

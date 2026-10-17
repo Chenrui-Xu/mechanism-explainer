@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const problems = [];
-const excluded = new Set(['node_modules', '.git', 'test-results', 'shots']);
+const excluded = new Set(['node_modules', '.git', 'test-results', 'shots', '_site']);
 async function walk(directory) {
   const results = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -20,7 +20,7 @@ async function walk(directory) {
 
 const skill = await readFile(resolve(root, 'SKILL.md'), 'utf8');
 const front = skill.match(/^---\n([\s\S]*?)\n---/);
-if (!front || !/^name: explain-with-models$/m.test(front[1]) || !/^description: .+/m.test(front[1])) {
+if (!front || !/^name: mechanism-explainer$/m.test(front[1]) || !/^description: .+/m.test(front[1])) {
   problems.push('Missing skill identity or description');
 }
 
